@@ -37,7 +37,7 @@ Documentation = "https://github.com/ocagdas/repo_pilot/blob/main/QUICKSTART.md"
 repo-pilot = "repo_pilot.cli:main"
 
 [project.optional-dependencies]
-dev = ["ruff==0.16.6", "build==1.6.0", "twine==7.0.0", "jsonschema==4.26.0", "PyYAML==6.0.3"]
+dev = ["ruff==0.16.7", "build==1.6.0", "twine==7.0.0", "jsonschema==4.26.0", "PyYAML==6.0.3"]
 cgc = ["codegraphcontext==0.6.13", "kuzu==0.11.3", "mcp==1.30.0"]
 sourcegraph = ["mcp==1.30.0"]
 all = ["codegraphcontext==0.6.13", "kuzu==0.11.3", "mcp==1.30.0"]
