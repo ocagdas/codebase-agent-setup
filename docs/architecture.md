@@ -1,13 +1,13 @@
 # Architecture and ownership
 
-Repo Pilot is a tooling distribution around official Spec Kit. Runtime code lives in `src/repo_pilot/`. Root launchers keep source-checkout commands usable before installation; machine and Docker setup remain separate entry points.
+codebase-agent-setup is a tooling distribution around official Spec Kit. Runtime code lives in `src/codebase_agent_setup/`. Root launchers keep source-checkout commands usable before installation; machine and Docker setup remain separate entry points.
 
 | Component | Responsibility and data ownership |
 | --- | --- |
-| src/repo_pilot/cli.py, setup_tooling.py | Installed entry point and static/editable dependency-profile setup |
+| src/codebase_agent_setup/cli.py, setup_tooling.py | Installed entry point and static/editable dependency-profile setup |
 | configure.py, project/ai_workflow/tools/settings.py | Shared configuration hierarchy, scope/origin resolution and project settings |
-| src/repo_pilot/toolchains.py, upstream.lock.json, requirements.txt | Immutable official-tool selection and compatibility; package_version is a separate mirror |
-| src/repo_pilot/install.py, src/repo_pilot/install_transaction.py | Staging, authored-file preservation, managed upgrade ledger, recoverable atomic installation |
+| src/codebase_agent_setup/toolchains.py, upstream.lock.json, requirements.txt | Immutable official-tool selection and compatibility; package_version is a separate mirror |
+| src/codebase_agent_setup/install.py, src/codebase_agent_setup/install_transaction.py | Staging, authored-file preservation, managed upgrade ledger, recoverable atomic installation |
 | preset/, extension/ | Composable upstream additions and engineering commands |
 | project/ | Consumer-installed instructions, defaults, schemas and bootstrap/completion utilities |
 | knowledge.py | Optional CGC/Sourcegraph adapter commands, bounded retrieval and checked full-snapshot transfer |
@@ -27,5 +27,5 @@ only declared payload patterns into the wheel; `MANIFEST.in` includes the author
 inputs for rebuilding from an sdist. Tests, local settings and bytecode are excluded
 from wheel payload data. Source/editable imports extend the package search path to
 its own checkout for the standalone `project` namespace. Installed wheels resolve
-all code and resources internally. `repo-pilot --version` reports `code_path` and
+all code and resources internally. `codebase-agent-setup --version` reports `code_path` and
 `resource_path` separately. No sibling checkout or generated source copy is required.

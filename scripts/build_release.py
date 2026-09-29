@@ -125,13 +125,13 @@ def main(argv=None):
         }
         if not required <= names:
             raise ValueError("Source distribution is missing maintenance guides or helpers")
-    with tempfile.TemporaryDirectory(prefix="repo-pilot-release-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="codebase-agent-setup-release-") as temporary:
         environment = Path(temporary) / "environment"
         subprocess.run([sys.executable, "-m", "venv", str(environment)], check=True, timeout=120)
         binary = environment / ("Scripts" if os.name == "nt" else "bin")
         python = binary / ("python.exe" if os.name == "nt" else "python")
         subprocess.run([str(python), "-m", "pip", "install", "--no-deps", str(wheels[0])], check=True, timeout=120)
-        launcher = binary / ("repo-pilot.exe" if os.name == "nt" else "repo-pilot")
+        launcher = binary / ("codebase-agent-setup.exe" if os.name == "nt" else "codebase-agent-setup")
         result = subprocess.run(
             [str(launcher), "--version"], cwd=temporary, check=True, capture_output=True, text=True, encoding="utf-8"
         )

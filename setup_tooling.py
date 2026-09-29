@@ -13,8 +13,8 @@ import sysconfig
 import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
-from repo_pilot import toolchains
-from repo_pilot.project.ai_workflow.tools.settings import resolve
+from codebase_agent_setup import toolchains
+from codebase_agent_setup.project.ai_workflow.tools.settings import resolve
 
 ROOT = Path(__file__).resolve().parent
 
@@ -69,7 +69,7 @@ def main():
     parser.add_argument("--mode", choices=["native", "venv", "conda"], default=None)
     parser.add_argument("--env-dir", type=Path, default=None)
     parser.add_argument(
-        "--conda-name", default=None, help="Conda environment name (resolved default: spec_kit_engineering)"
+        "--conda-name", default=None, help="Conda environment name (resolved default: codebase-agent-setup)"
     )
     parser.add_argument("--repo", type=Path, help="Optional project scope for settings")
     parser.add_argument("--user-config", type=Path)
@@ -153,7 +153,7 @@ def main():
                     toolchains.requirement(selection),
                 ]
         plan.append(package_command(install_mode, args.env_dir, args.conda_name, args.install_mode, args.extras))
-        record_path = args.env_dir / ".repo-pilot-toolchain.json"
+        record_path = args.env_dir / ".codebase-agent-setup-toolchain.json"
         if install_mode == "venv" and args.env_dir.exists():
             if record_path.is_file():
                 existing = toolchains.validate_record(json.loads(record_path.read_text(encoding="utf-8")))
@@ -211,7 +211,7 @@ def main():
                     )
                 )
                 specify = str(toolchains.cli_in(prefix))
-                record_path = prefix / ".repo-pilot-toolchain.json"
+                record_path = prefix / ".codebase-agent-setup-toolchain.json"
             else:
                 scripts = native_scripts_directory()
                 specify = str(scripts / ("specify.exe" if os.name == "nt" else "specify"))
@@ -227,11 +227,17 @@ def main():
         finally:
             if setup_lock:
                 setup_lock.unlink(missing_ok=True)
-        print("Repo Pilot installed (" + args.install_mode + ", " + args.extras + ").")
-        print("Use repo-pilot --version and repo-pilot install /path/to/project --apply in the selected environment.")
+        print("codebase-agent-setup installed (" + args.install_mode + ", " + args.extras + ").")
+        print(
+            "Use codebase-agent-setup --version and codebase-agent-setup install /path/to/project --apply in the selected environment."
+        )
         if install_mode == "venv":
             print(
-                "Launcher: " + str(args.env_dir / ("Scripts/repo-pilot.exe" if os.name == "nt" else "bin/repo-pilot"))
+                "Launcher: "
+                + str(
+                    args.env_dir
+                    / ("Scripts/codebase-agent-setup.exe" if os.name == "nt" else "bin/codebase-agent-setup")
+                )
             )
         if args.install_mode == "editable":
             print(

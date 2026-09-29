@@ -26,9 +26,10 @@ class ToolchainError(ValueError):
 
 
 def command_timeout(kind="command"):
-    variable = "REPO_PILOT_" + kind.upper() + "_TIMEOUT"
+    variable = "CBSETUP_" + kind.upper() + "_TIMEOUT"
+    legacy = "REPO_PILOT_" + kind.upper() + "_TIMEOUT"  # accepted from before the rename
     try:
-        value = float(os.environ.get(variable, "15" if kind == "probe" else "600"))
+        value = float(os.environ.get(variable, os.environ.get(legacy, "15" if kind == "probe" else "600")))
         if not 0 < value < float("inf"):
             raise ValueError()
         return value
@@ -121,7 +122,7 @@ def resolve_selection(ref=None, record_file=None):
         ):
             raise ToolchainError("Selected ref conflicts with imported toolchain record")
         if data["package_version"] != pin["package_version"]:
-            raise ToolchainError("Toolchain record belongs to a different engineering package version")
+            raise ToolchainError("Toolchain record belongs to a different codebase-agent-setup package version")
         return {
             key: data[key]
             for key in (

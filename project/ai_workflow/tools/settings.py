@@ -16,7 +16,7 @@ import uuid
 from urllib.parse import urlsplit
 
 DEFAULTS = {
-    "tooling": {"mode": "venv", "env_dir": None, "conda_name": "spec_kit_engineering"},
+    "tooling": {"mode": "venv", "env_dir": None, "conda_name": "codebase-agent-setup"},
     "speckit": {"ref": None},
     "agent": {"integrations": ["codex"]},
     "knowledge": {"mode": "auto", "base_refs": None, "backend": "off"},
@@ -47,7 +47,9 @@ def user_file():
         root = Path.home() / "Library/Application Support"
     else:
         root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
-    return root / "repo-pilot/config.json"
+    path = root / "codebase-agent-setup/config.json"
+    legacy = root / "repo-pilot/config.json"  # name before the codebase-agent-setup rename
+    return legacy if not path.exists() and legacy.exists() else path
 
 
 def canonical_remote(remote):

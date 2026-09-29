@@ -29,7 +29,7 @@ class SettingsTests(unittest.TestCase):
         return resolve(self.repo, self.user, overrides)
 
     def test_precedence_at_every_boundary(self):
-        self.assertEqual(self.resolve()["settings"]["tooling"]["conda_name"], "spec_kit_engineering")
+        self.assertEqual(self.resolve()["settings"]["tooling"]["conda_name"], "codebase-agent-setup")
         self.write(
             self.user,
             {"tooling": {"conda_name": "user"}},

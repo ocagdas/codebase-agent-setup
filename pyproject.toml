@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "repo-pilot"
+name = "codebase-agent-setup"
 version = "1.1.0"
 description = "Project guidance and optional code knowledge for GitHub Spec Kit"
 requires-python = ">=3.11"
@@ -26,15 +26,16 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/ocagdas/repo_pilot"
-Repository = "https://github.com/ocagdas/repo_pilot"
-Issues = "https://github.com/ocagdas/repo_pilot/issues"
-Documentation = "https://github.com/ocagdas/repo_pilot/blob/main/QUICKSTART.md"
+Homepage = "https://github.com/ocagdas/codebase-agent-setup"
+Repository = "https://github.com/ocagdas/codebase-agent-setup"
+Issues = "https://github.com/ocagdas/codebase-agent-setup/issues"
+Documentation = "https://github.com/ocagdas/codebase-agent-setup/blob/main/QUICKSTART.md"
 
 
 
 [project.scripts]
-repo-pilot = "repo_pilot.cli:main"
+codebase-agent-setup = "codebase_agent_setup.cli:main"
+cbsetup = "codebase_agent_setup.cli:main"
 
 [project.optional-dependencies]
 dev = ["ruff==0.16.8", "build==1.6.0", "twine==7.0.0", "jsonschema==4.26.0", "PyYAML==6.0.3"]
@@ -43,7 +44,7 @@ sourcegraph = ["mcp==1.30.0"]
 all = ["codegraphcontext==0.6.13", "kuzu==0.11.3", "mcp==1.30.0"]
 
 [tool.setuptools]
-packages = ["repo_pilot"]
+packages = ["codebase_agent_setup"]
 package-dir = {"" = "src"}
 include-package-data = false
 
@@ -51,7 +52,7 @@ include-package-data = false
 build_py = "build_support.BuildPy"
 
 [tool.setuptools.package-data]
-repo_pilot = [
+codebase_agent_setup = [
   "upstream.lock.json", "legacy_v6_files.json", "requirements*.txt", "environment.yml",
   "preset/**/*.md", "preset/*.yml", "extension/**/*.md", "extension/*.yml",
   "project/ai_workflow/LICENSE", "project/*.md", "project/ai_workflow/*.md", "project/ai_workflow/*.json",
@@ -61,7 +62,7 @@ repo_pilot = [
 ]
 
 [tool.setuptools.exclude-package-data]
-repo_pilot = ["**/test_*.py", "**/__pycache__/*", "**/settings.local.json"]
+codebase_agent_setup = ["**/test_*.py", "**/__pycache__/*", "**/settings.local.json"]
 
 [tool.ruff]
 target-version = "py311"

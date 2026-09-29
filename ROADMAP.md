@@ -35,7 +35,7 @@ Implemented precedence, lowest to highest:
 
 This interprets the requested hierarchy as reading user defaults first, overlaying shared project settings, then personal project and checkout settings. To supersede a team default, set the preference in the personal project layer. Within user configuration, merge general settings before the matching project entry.
 
-Implemented locations are an OS-appropriate user configuration directory containing `repo-pilot/config.json` with general settings and project entries, committed `ai_workflow/settings.json`, and ignored `ai_workflow/settings.local.json`. Existing bootstrap.json navigation fields enter at shared-project precedence before settings.json. Project policy and commands remain in their existing files; configuration does not copy them into a second authority.
+Implemented locations are an OS-appropriate user configuration directory containing `codebase-agent-setup/config.json` with general settings and project entries, committed `ai_workflow/settings.json`, and ignored `ai_workflow/settings.local.json`. Existing bootstrap.json navigation fields enter at shared-project precedence before settings.json. Project policy and commands remain in their existing files; configuration does not copy them into a second authority.
 
 Recursively merge mappings; replace lists/scalars; reject unknown keys; define null/reset behaviour in the schema. Resolve relative paths against the declaring file. Provide effective-configuration inspection showing each setting's origin with secrets redacted. All commands must use the same resolver.
 

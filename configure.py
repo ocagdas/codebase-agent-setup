@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
-from repo_pilot.project.ai_workflow.tools.settings import main
+from codebase_agent_setup.project.ai_workflow.tools.settings import main
 
 if __name__ == "__main__":
     raise SystemExit(main())

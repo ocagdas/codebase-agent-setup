@@ -8,7 +8,7 @@ At the beginning of a repository session, run:
 python3 ai_workflow/tools/repo_bootstrap.py prepare
 ```
 
-All three commands (`prepare`, `complete`, `status`) use the target repository's `ai_workflow/bootstrap.json` by default, including through the installed `repo-pilot bootstrap` command. `--config` overrides it; the bundled configuration is used only when the project has none. Invalid project configuration is an error, not a fallback.
+All three commands (`prepare`, `complete`, `status`) use the target repository's `ai_workflow/bootstrap.json` by default, including through the installed `codebase-agent-setup bootstrap` command. `--config` overrides it; the bundled configuration is used only when the project has none. Invalid project configuration is an error, not a fallback.
 
 Read the JSON result. Inspect semantic status before acting on `action_required`. If it is `none`, no prose analysis refresh is requested, but semantic refresh may still be needed. If it is `full_analysis` or `incremental_analysis`, complete the analysis request before relying on repository knowledge.
 

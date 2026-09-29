@@ -77,8 +77,14 @@ def cgc_command(ctx, *args):
     ]
 
 
+STATE_FILE = "codebase-agent-setup.json"
+LEGACY_STATE_FILE = "repo-pilot.json"  # read-only fallback from before the rename
+
+
 def state(ctx):
-    path = Path(ctx["data_dir"]) / "repo-pilot.json"
+    path = Path(ctx["data_dir"]) / STATE_FILE
+    if not path.exists():
+        path = Path(ctx["data_dir"]) / LEGACY_STATE_FILE
     if not path.exists():
         return None
     value = json.loads(path.read_text(encoding="utf-8"))
@@ -134,9 +140,10 @@ def index(ctx):
     check_cgc_version(ctx)
     data = Path(ctx["data_dir"])
     data.mkdir(parents=True, exist_ok=True)
-    marker = data / "repo-pilot.json"
+    marker = data / STATE_FILE
     # Invalidate first: failed or interrupted rebuilding must not leave a current marker.
     marker.unlink(missing_ok=True)
+    (data / LEGACY_STATE_FILE).unlink(missing_ok=True)
     subprocess.run(
         cgc_command(ctx, "index", ctx["repo"], "--force"),
         cwd=ctx["repo"],
@@ -239,7 +246,7 @@ def bundle(ctx, operation, filename):
             ctx["repo"], "status", "--porcelain", "--untracked-files=normal"
         ):
             raise SettingsError("Checkout changed during import.")
-        (staging / "repo-pilot.json").write_text(
+        (staging / STATE_FILE).write_text(
             json.dumps({k: ctx[k] for k in ("repo", "repository_id", "revision")} | {"graph_root": graph_root}) + "\n",
             encoding="utf-8",
         )

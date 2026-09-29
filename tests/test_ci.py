@@ -73,7 +73,7 @@ class QualityGateTests(unittest.TestCase):
             return unittest.TestSuite([Skipped("test_fixture")])
 
         environment = {key: "fixture" for key in ("SPECIFY_BIN", "SPECIFY_ALTERNATE_BIN", "SPECIFY_ALTERNATE_RECORD")}
-        environment["REPO_PILOT_PACKAGE_TESTS"] = "1"
+        environment["CBSETUP_PACKAGE_TESTS"] = "1"
         with (
             patch.dict(os.environ, environment),
             patch.object(unittest.TestLoader, "discover", side_effect=suite),

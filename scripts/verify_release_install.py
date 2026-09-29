@@ -1,4 +1,4 @@
-"""Qualify a downloaded Repo Pilot wheel in an isolated environment."""
+"""Qualify a downloaded codebase-agent-setup wheel in an isolated environment."""
 
 import json
 import os
@@ -21,13 +21,13 @@ def main():
         for suffix in ("project/AI_CONTEXT.md", "project/ai_workflow/settings.md"):
             if not any(name.endswith(suffix) for name in names):
                 raise ValueError(f"Missing consumer resource: {suffix}")
-    with tempfile.TemporaryDirectory(prefix="repo-pilot-published-") as temp:
+    with tempfile.TemporaryDirectory(prefix="codebase-agent-setup-published-") as temp:
         env = Path(temp) / "env"
         subprocess.run([sys.executable, "-m", "venv", str(env)], check=True)
         binary = env / ("Scripts" if os.name == "nt" else "bin")
         python = binary / ("python.exe" if os.name == "nt" else "python")
         subprocess.run([str(python), "-m", "pip", "install", "--no-deps", str(wheel)], check=True)
-        cli = binary / ("repo-pilot.exe" if os.name == "nt" else "repo-pilot")
+        cli = binary / ("codebase-agent-setup.exe" if os.name == "nt" else "codebase-agent-setup")
         result = subprocess.check_output([str(cli), "--version"], cwd=temp, text=True, encoding="utf-8")
         if json.loads(result)["version"] != provenance["version"]:
             raise ValueError("Installed version differs from released version")

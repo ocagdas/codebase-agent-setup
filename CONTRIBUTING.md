@@ -20,7 +20,7 @@ py -3 -m unittest discover -s project/ai_workflow/tools -p "test_*.py"
 
 Without SPECIFY_BIN the installation tests skip deliberately; report that omission. Test modified environment modes with actual tools before marking them verified. Keep CI and local evidence distinct.
 
-Runtime code lives in `src/repo_pilot/`; see [architecture](docs/architecture.md) for
+Runtime code lives in `src/codebase_agent_setup/`; see [architecture](docs/architecture.md) for
 source/editable resource handling and wheel assembly. Root install/configure/knowledge
 commands are launchers. Edit `project/`, `preset/` and `extension/` at their authored
 paths; do not copy them into src.
@@ -50,7 +50,7 @@ Install requirements-knowledge.txt in a disposable environment and run tests/tes
 
 ## Installed distribution checks
 
-Set `REPO_PILOT_PACKAGE_TESTS=1` to include actual static/editable pip installations in the unittest suite. These build in disposable environments and may need network access for the build backend. With SPECIFY_BIN set, the packaging test also exercises a static installed launcher after its source checkout is moved, then verifies consumer installation and preservation on upgrade. Keep pyproject.toml's version consistent with upstream.lock.json and its optional dependency profiles consistent with requirements-knowledge.txt. Hidden integration payload files must remain present in wheels.
+Set `CBSETUP_PACKAGE_TESTS=1` to include actual static/editable pip installations in the unittest suite. These build in disposable environments and may need network access for the build backend. With SPECIFY_BIN set, the packaging test also exercises a static installed launcher after its source checkout is moved, then verifies consumer installation and preservation on upgrade. Keep pyproject.toml's version consistent with upstream.lock.json and its optional dependency profiles consistent with requirements-knowledge.txt. Hidden integration payload files must remain present in wheels.
 
 ## Baseline and CI status
 

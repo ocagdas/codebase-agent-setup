@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def run(full=False):
     required = ("SPECIFY_BIN", "SPECIFY_ALTERNATE_BIN", "SPECIFY_ALTERNATE_RECORD")
-    if full and (any(not os.environ.get(key) for key in required) or os.environ.get("REPO_PILOT_PACKAGE_TESTS") != "1"):
+    if full and (any(not os.environ.get(key) for key in required) or os.environ.get("CBSETUP_PACKAGE_TESTS") != "1"):
         raise ValueError(
-            "Full tests require SPECIFY_BIN, SPECIFY_ALTERNATE_BIN, SPECIFY_ALTERNATE_RECORD and REPO_PILOT_PACKAGE_TESTS=1"
+            "Full tests require SPECIFY_BIN, SPECIFY_ALTERNATE_BIN, SPECIFY_ALTERNATE_RECORD and CBSETUP_PACKAGE_TESTS=1"
         )
     records = []
     for directory in (ROOT / "tests", ROOT / "project/ai_workflow/tools"):

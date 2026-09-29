@@ -1,6 +1,6 @@
 {
   "contract_version": "1.0.0",
-  "project": "repo_pilot",
+  "project": "codebase_agent_setup",
   "required_jobs": [
     "quality",
     "unit",

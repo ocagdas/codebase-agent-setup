@@ -56,8 +56,8 @@ Conda setup prints the exact activation command with the suffixed name. Once act
 Docker example:
 
 ```bash
-docker build --build-arg SPEC_KIT_REF=v1.0.3 -t spec_kit_engineering:local-1.0.3 .
-docker run --rm --mount "type=bind,source=/absolute/path/to/project,target=/repo" spec_kit_engineering:local-1.0.3 /repo --integration copilot
+docker build --build-arg SPEC_KIT_REF=v1.0.3 -t codebase-agent-setup:local-1.0.3 .
+docker run --rm --mount "type=bind,source=/absolute/path/to/project,target=/repo" codebase-agent-setup:local-1.0.3 /repo --integration copilot
 ```
 
 Add `--apply` after reviewing the container installer preview. Existing ownership/platform mount guidance in INSTALLATION.md still applies. Both default and alternate Docker images were built and exercised with non-root mounted-project preview/apply on Linux; see VALIDATION.md for exact evidence and limits.
@@ -72,13 +72,13 @@ Results distinguish `distribution_default` from `local_override_checked`. Checks
 
 ## Resolved records and sharing
 
-After successful setup, `.repo-pilot-toolchain.json` is written inside the selected venv/Conda environment. Native default setup records live under this distribution's ignored `.toolchains/records/` directory. Export a portable copy deliberately:
+After successful setup, `.codebase-agent-setup-toolchain.json` is written inside the selected venv/Conda environment. Native default setup records live under this distribution's ignored `.toolchains/records/` directory. Export a portable copy deliberately:
 
 ```bash
 python setup_tooling.py --repo /path/to/project --export-record /tmp/my-toolchain.json --apply
 ```
 
-The record includes official repository, exact source commit, requested ref, CLI and engineering package versions, checked integrations, source verification and the package fingerprint. It contains no executable commands or machine-specific environment path. This pins Spec Kit source, not all transitive Python/OS dependencies. Do not claim it reproduces the entire machine environment.
+The record includes official repository, exact source commit, requested ref, CLI and codebase-agent-setup package versions, checked integrations, source verification and the package fingerprint. It contains no executable commands or machine-specific environment path. This pins Spec Kit source, not all transitive Python/OS dependencies. Do not claim it reproduces the entire machine environment.
 
 On another machine, import that exact selection:
 
@@ -88,7 +88,7 @@ python install.py /path/to/project --toolchain-record /path/to/my-toolchain.json
 python install.py /path/to/project --toolchain-record /path/to/my-toolchain.json --apply
 ```
 
-Import avoids resolving a tag again, but a fresh installation still needs source/dependency access. Conflicting explicit/configured refs or a different engineering package version are rejected. Imported compatibility claims are not trusted: local staging runs again. A ref in a record is informational; its exact commit is the selection. Export refuses to replace arbitrary authored files.
+Import avoids resolving a tag again, but a fresh installation still needs source/dependency access. Conflicting explicit/configured refs or a different codebase-agent-setup package version are rejected. Imported compatibility claims are not trusted: local staging runs again. A ref in a record is informational; its exact commit is the selection. Export refuses to replace arbitrary authored files.
 
 Keep personal exports outside project source or under ignored `.ai_cache/`. Commit a reviewed record only if intentionally adopting it as a team lock. Never commit the virtual environments themselves.
 

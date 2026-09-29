@@ -1,13 +1,13 @@
 # Use this as your tooling repository
 
-Extract the archive, open the spec_kit_engineering directory and push its contents as the root of a new repository. Keep project/, preset/, extension/, tests/, the installation files and documentation. Do not push .venv, caches or credentials; ignore rules are included.
+Extract the archive, open the codebase-agent-setup directory and push its contents as the root of a new repository. Keep project/, preset/, extension/, tests/, the installation files and documentation. Do not push .venv, caches or credentials; ignore rules are included.
 
 Example initialisation, after substituting your actual Git remote:
 
 ```text
 git init -b main
 git add .
-git commit -m "Add Spec Kit engineering package"
+git commit -m "Add codebase-agent-setup"
 git remote add origin YOUR_GIT_REMOTE
 git push -u origin main
 ```

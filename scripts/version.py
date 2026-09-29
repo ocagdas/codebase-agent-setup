@@ -99,7 +99,7 @@ def create_tag(*, dry_run: bool = False) -> str:
     if git("status", "--porcelain"):
         raise ValueError("Working tree must be clean before tagging")
     if not commit and not dry_run:
-        git("tag", "-a", tag, "-m", f"Repo Pilot {tag}")
+        git("tag", "-a", tag, "-m", f"codebase-agent-setup {tag}")
     return tag
 
 

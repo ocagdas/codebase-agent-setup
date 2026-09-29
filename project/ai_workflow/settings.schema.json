@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Repo Pilot settings 1.0",
+  "title": "codebase-agent-setup settings 1.0",
   "description": "Scope rules are additionally checked by the runtime resolver: projects only in user files, repository_id only in shared project files.",
   "type": "object",
   "additionalProperties": false,

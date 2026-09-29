@@ -168,4 +168,4 @@ jobs:
       source: ${{ github.sha }}
       trunk: ${{ vars.REPOSITORY_TRUNK || 'main' }}
     secrets:
-      versioning-private-key: ${{ secrets.REPO_PILOT_VERSIONING_APP_PRIVATE_KEY }}
+      versioning-private-key: ${{ secrets.CBSETUP_VERSIONING_APP_PRIVATE_KEY }}

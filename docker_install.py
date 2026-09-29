@@ -7,7 +7,7 @@ import shutil
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
-from repo_pilot import toolchains
+from codebase_agent_setup import toolchains
 
 
 def main():

@@ -30,7 +30,7 @@ class PublishVersionTests(unittest.TestCase):
             "GITHUB_EVENT_NAME": "push",
             "GITHUB_REF": "refs/heads/main",
             "GITHUB_ACTOR": "maintainer",
-            "REPO_PILOT_ASSOCIATED_PR": "true",
+            "CBSETUP_ASSOCIATED_PR": "true",
         }
         self.env.pop("GITHUB_OUTPUT", None)
         (self.repo / ".gitignore").write_text("__pycache__/\n", encoding="utf-8")
@@ -80,7 +80,7 @@ class PublishVersionTests(unittest.TestCase):
             self.source,
             "--trunk",
             "main",
-            *(["--merged"] if self.env["REPO_PILOT_ASSOCIATED_PR"] == "true" else []),
+            *(["--merged"] if self.env["CBSETUP_ASSOCIATED_PR"] == "true" else []),
             good=good,
         )
 
@@ -131,7 +131,7 @@ class PublishVersionTests(unittest.TestCase):
         self.git("add", ".")
         self.git("commit", "-m", "select minor release")
         self.source = self.git("rev-parse", "HEAD")
-        self.env.update(GITHUB_SHA=self.source, REPO_PILOT_ASSOCIATED_PR="false")
+        self.env.update(GITHUB_SHA=self.source, CBSETUP_ASSOCIATED_PR="false")
         self.git("push", "origin", "main")
         self.publish()
         self.assertEqual(self.git("rev-parse", "HEAD"), self.source)

@@ -1,4 +1,4 @@
-# Maintaining Repo Pilot safely
+# Maintaining codebase-agent-setup safely
 
 Read [README.md](README.md), [STATUS.md](STATUS.md), [CONTRIBUTING.md](CONTRIBUTING.md),
 [TODO.md](TODO.md) and [VALIDATION.md](VALIDATION.md). Inspect Git status and preserve
@@ -6,7 +6,7 @@ unrelated changes before editing. [REPOSITORY_STRUCTURE.md](REPOSITORY_STRUCTURE
 identifies policy owners; update them rather than copying policy into this handoff.
 
 `project/` is the installed consumer payload. Its AI_CONTEXT.md and AGENTS.md do not
-instruct work on this tooling distribution. Runtime code lives in `src/repo_pilot/`;
+instruct work on this tooling distribution. Runtime code lives in `src/codebase_agent_setup/`;
 [architecture](docs/architecture.md) explains source, editable and wheel resources.
 Preserve consumer-authored files and test installation/upgrade recovery when changing
 those paths. Keep upstream.lock.json and requirements.txt consistent.

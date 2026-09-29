@@ -23,12 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:
-      group: repo-pilot-version-${{ inputs.trunk }}
+      group: codebase-agent-setup-version-${{ inputs.trunk }}
       cancel-in-progress: false
     env:
       SOURCE: ${{ inputs.source }}
       TRUNK: ${{ inputs.trunk }}
-      REPO_PILOT_VERSIONING_ACTOR: ${{ vars.REPO_PILOT_VERSIONING_ACTOR || 'repo-pilot-versioning[bot]' }}
+      CBSETUP_VERSIONING_ACTOR: ${{ vars.CBSETUP_VERSIONING_ACTOR || 'codebase-agent-setup-versioning[bot]' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -55,17 +55,17 @@ jobs:
       - name: Require versioning app configuration
         if: steps.classify.outputs.mode == 'patch' || steps.classify.outputs.mode == 'tag'
         env:
-          APP_ID: ${{ vars.REPO_PILOT_VERSIONING_APP_ID }}
+          APP_ID: ${{ vars.CBSETUP_VERSIONING_APP_ID }}
           HAS_KEY: ${{ secrets.versioning-private-key != '' }}
         run: |
-          test -n "$APP_ID" || { echo '::error::Missing REPO_PILOT_VERSIONING_APP_ID repository variable'; exit 1; }
-          test "$HAS_KEY" = true || { echo '::error::Missing REPO_PILOT_VERSIONING_APP_PRIVATE_KEY repository secret'; exit 1; }
+          test -n "$APP_ID" || { echo '::error::Missing CBSETUP_VERSIONING_APP_ID repository variable'; exit 1; }
+          test "$HAS_KEY" = true || { echo '::error::Missing CBSETUP_VERSIONING_APP_PRIVATE_KEY repository secret'; exit 1; }
       - name: Create versioning app token
         if: steps.classify.outputs.mode == 'patch' || steps.classify.outputs.mode == 'tag'
         id: token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ vars.REPO_PILOT_VERSIONING_APP_ID }}
+          app-id: ${{ vars.CBSETUP_VERSIONING_APP_ID }}
           private-key: ${{ secrets.versioning-private-key }}
           permission-contents: write
       - name: Check out tested commit with publication credentials
@@ -78,8 +78,8 @@ jobs:
       - name: Publish version and tag atomically
         if: steps.token.outputs.token != ''
         run: |
-          git config user.name "$REPO_PILOT_VERSIONING_ACTOR"
-          git config user.email "${REPO_PILOT_VERSIONING_ACTOR}@users.noreply.github.com"
+          git config user.name "$CBSETUP_VERSIONING_ACTOR"
+          git config user.email "${CBSETUP_VERSIONING_ACTOR}@users.noreply.github.com"
           args=()
           if [ "$MERGED" = true ]; then args+=(--merged); fi
           python scripts/publish_version.py --source "$SOURCE" --trunk "$TRUNK" "${args[@]}" --github-output

@@ -18,7 +18,7 @@ def main():
     args = parser.parse_args()
     pin = json.loads((ROOT / "upstream.lock.json").read_text(encoding="utf-8"))
     directory = args.directory.resolve()
-    variables = {"REPO_PILOT_PACKAGE_TESTS": "1"}
+    variables = {"CBSETUP_PACKAGE_TESTS": "1"}
     for name, commit in (("default", pin["upstream_commit"]), ("alternate", ALTERNATE_COMMIT)):
         environment = directory / name
         subprocess.run([sys.executable, "-m", "venv", str(environment)], check=True, timeout=120)
