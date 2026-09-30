@@ -1,4 +1,4 @@
-name: spec_kit_engineering
+name: codebase-agent-setup
 channels:
   - conda-forge
 dependencies:

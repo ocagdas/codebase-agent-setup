@@ -40,7 +40,7 @@ python -m pip install codegraphcontext==0.6.13 kuzu==0.11.3 mcp==1.30.0
 
 From the distribution, `python -m pip install -r requirements-knowledge.txt` is equivalent. Use an activated venv or Conda environment normally; no `conda run` is needed. These are optional dependencies and do not change Spec Kit's pinned requirements. A container can install the same optional requirements and mount the checkout; it must retain or export the cache to reuse it.
 
-This adapter deliberately selects embedded Kuzu, passing both CGC's explicit database path and runtime overrides. Parsed data lives at `<repo>/.ai_cache/code_knowledge/cgc/kuzudb`, with a Repo Pilot revision record alongside it. `cgc.data_dir` overrides the containing directory; relative paths resolve against the declaring settings file. Use a private directory per checkout/snapshot. Do not point two different clones at the same mutable database. A lock prevents concurrent access through this wrapper; stop direct upstream CGC processes before operating on it.
+This adapter deliberately selects embedded Kuzu, passing both CGC's explicit database path and runtime overrides. Parsed data lives at `<repo>/.ai_cache/code_knowledge/cgc/kuzudb`, with a codebase-agent-setup revision record alongside it. `cgc.data_dir` overrides the containing directory; relative paths resolve against the declaring settings file. Use a private directory per checkout/snapshot. Do not point two different clones at the same mutable database. A lock prevents concurrent access through this wrapper; stop direct upstream CGC processes before operating on it.
 
 CGC used directly has its own global/local/named context selection, including data under `~/.codegraphcontext`. It may also write configuration and logs there even when the graph database is redirected. Running bare `cgc` is therefore not equivalent to using this wrapper.
 
@@ -94,7 +94,7 @@ Set `SOURCEGRAPH_TOKEN` in your shell or secret manager. The configuration store
 
 Parsed/indexed data stays on the Sourcegraph deployment, managed by its administrators. All clones and authorized team members reuse that service: share its URL and repository name, and use separate user credentials. The adapter issues literal keyword searches scoped to the configured repository and local HEAD commit. The server must have that commit; unpublished branches and dirty local edits are unavailable through this adapter. Errors request source fallback rather than silently querying the default branch.
 
-Repo Pilot does not download or export Sourcegraph's internal graph as a CGC bundle. Sourcegraph provisioning, repository synchronization and precise code-intelligence uploads remain server/CI responsibilities. This adapter currently exposes keyword retrieval over MCP; it does not expose all Sourcegraph navigation tools.
+codebase-agent-setup does not download or export Sourcegraph's internal graph as a CGC bundle. Sourcegraph provisioning, repository synchronization and precise code-intelligence uploads remain server/CI responsibilities. This adapter currently exposes keyword retrieval over MCP; it does not expose all Sourcegraph navigation tools.
 
 ## Trunks, CI and local deltas
 

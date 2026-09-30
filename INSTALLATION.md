@@ -2,7 +2,7 @@
 
 For a guided first setup followed by configuration and usage, start with [QUICKSTART.md](QUICKSTART.md).
 
-Use this repository as the tooling distribution. Keep it outside the software repository you want to configure. Machine setup installs the repo-pilot launcher and official Spec Kit; install.py then installs the project files. The same tooling environment can serve multiple project clones.
+Use this repository as the tooling distribution. Keep it outside the software repository you want to configure. Machine setup installs the codebase-agent-setup launcher and official Spec Kit; install.py then installs the project files. The same tooling environment can serve multiple project clones.
 
 The default is a Python virtual environment. Native Python, Conda and Docker are alternatives. Minimal setup does not install graph dependencies. Add `--extras cgc`, `sourcegraph` or `all` for optional clients; use `--static` (default) or `--editable` to select source update behavior. See [docs/user/installation-modes.md](docs/user/installation-modes.md). Coding assistants, compilers, board SDKs and model subscriptions remain separate.
 
@@ -73,14 +73,14 @@ Outside an active venv or Conda environment, this uses pip's user installation. 
 From this tooling repository in a Conda-enabled shell, choose an environment name and activate it:
 
 ```text
-conda env create --name spec_kit_engineering --file environment.yml
-conda activate spec_kit_engineering
+conda env create --name codebase-agent-setup --file environment.yml
+conda activate codebase-agent-setup
 specify version
 python install.py /path/to/project --specify specify --integration copilot
 python install.py /path/to/project --specify specify --integration copilot --apply
 ```
 
-Use a Windows path such as `C:\work\project` on Windows. `spec_kit_engineering` is only the default: replace it with your chosen name in creation and activation commands. `--name` overrides the name in environment.yml. Once active, use `python` and `specify` normally. Explicit `--specify specify` chooses the CLI on the environment's PATH rather than an existing tooling `.venv`.
+Use a Windows path such as `C:\work\project` on Windows. `codebase-agent-setup` is only the default: replace it with your chosen name in creation and activation commands. `--name` overrides the name in environment.yml. Once active, use `python` and `specify` normally. Explicit `--specify specify` chooses the CLI on the environment's PATH rather than an existing tooling `.venv`.
 
 When Python and Conda are already available, the helper offers the same override:
 
@@ -139,25 +139,25 @@ See the official [Conda shell initialisation documentation](https://docs.conda.i
 Build the tooling image from this repository:
 
 ```text
-docker build -t spec_kit_engineering:1.1 .
+docker build -t codebase-agent-setup:1.1 .
 ```
 
 Linux example, preserving host file ownership:
 
 ```bash
-docker run --rm --user "$(id -u):$(id -g)" --env XDG_CACHE_HOME=/tmp/cache --mount "type=bind,source=/absolute/path/to/project,target=/repo" spec_kit_engineering:1.1 /repo --integration copilot --apply
+docker run --rm --user "$(id -u):$(id -g)" --env XDG_CACHE_HOME=/tmp/cache --mount "type=bind,source=/absolute/path/to/project,target=/repo" codebase-agent-setup:1.1 /repo --integration copilot --apply
 ```
 
 macOS example:
 
 ```bash
-docker run --rm --mount "type=bind,source=/absolute/path/to/project,target=/repo" spec_kit_engineering:1.1 /repo --integration copilot --apply
+docker run --rm --mount "type=bind,source=/absolute/path/to/project,target=/repo" codebase-agent-setup:1.1 /repo --integration copilot --apply
 ```
 
 Windows PowerShell example:
 
 ```powershell
-docker run --rm --mount "type=bind,source=C:\work\project,target=/repo" spec_kit_engineering:1.1 /repo --integration copilot --apply
+docker run --rm --mount "type=bind,source=C:\work\project,target=/repo" codebase-agent-setup:1.1 /repo --integration copilot --apply
 ```
 
 The target directory must already exist. Omit --apply to preview. Only the mounted target is installed into; source files and existing authored instructions are protected by installer conflict checks. This is a Linux tooling container on all three hosts, not a Windows container. It creates repository instructions; it does not run your IDE or agents. Local agent bootstrap later still needs Python and Git in the agent's execution environment.
@@ -207,7 +207,7 @@ Project installation stages content before writing it. Each destination is repla
 
 Recovery checks the saved hashes before restoring files. If someone edited a destination after interruption, or a backup is damaged, it stops and identifies the journal and conflicting file for manual reconciliation. Keep the journal until that reconciliation is complete. An operating-system file lock blocks another installer while the current process is running and is released when that process exits. The persistent `.specify/engineering-install.lock` file must not be removed while installers are running. Journals from the earlier PID-based implementation require manual reconciliation after stopping old installers; the new implementation never probes or signals their PIDs. Run one installer per checkout. This mechanism handles process interruptions and ordinary I/O failures; it is not a guarantee against power loss, filesystem corruption or concurrent external edits. The optional exported toolchain record is written after the project transaction; if export fails, the completed project installation remains in place and the command can be retried.
 
-Toolchain probes default to **15 seconds** and other toolchain/setup commands to **600 seconds per command**. Set `REPO_PILOT_PROBE_TIMEOUT` or `REPO_PILOT_COMMAND_TIMEOUT` to a finite positive number of seconds to override these limits, for example when downloading dependencies over a slow connection. Discovery continues to other candidates after a probe times out. POSIX timeout handling terminates the command's process group; Windows handling terminates the immediate process. These controls do not change the knowledge adapter's separate indexing/query limits.
+Toolchain probes default to **15 seconds** and other toolchain/setup commands to **600 seconds per command**. Set `CBSETUP_PROBE_TIMEOUT` or `CBSETUP_COMMAND_TIMEOUT` to a finite positive number of seconds to override these limits, for example when downloading dependencies over a slow connection. Discovery continues to other candidates after a probe times out. POSIX timeout handling terminates the command's process group; Windows handling terminates the immediate process. These controls do not change the knowledge adapter's separate indexing/query limits.
 
 Recovery journals now record explicit prepared, committed and rolled-back phases. Completed journals are atomically renamed to `.specify/engineering-retired-*` before deletion. A deletion failure reports deferred cleanup; a later installation retries it without treating the remnants as an active transaction. The installer adds ignore rules for the lock, active journal and retired directories. Locking uses `flock` on POSIX and byte-range locking on Windows; Windows execution still requires platform validation.
 

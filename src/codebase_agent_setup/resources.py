@@ -18,12 +18,12 @@ def resource_root(package_root):
         project = config.get("project")
         if (
             isinstance(project, dict)
-            and project.get("name") == "repo-pilot"
+            and project.get("name") == "codebase-agent-setup"
             and (checkout / "upstream.lock.json").is_file()
             and (checkout / "project/ai_workflow/tools/settings.py").is_file()
         ):
             return checkout
-    raise RuntimeError("Repo Pilot resource payload is missing; reinstall the distribution")
+    raise RuntimeError("codebase-agent-setup resource payload is missing; reinstall the distribution")
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parent

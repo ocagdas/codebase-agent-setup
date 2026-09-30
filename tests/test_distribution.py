@@ -59,11 +59,11 @@ class DistributionTests(unittest.TestCase):
         self.assertEqual(set(data["optional-dependencies"]["all"]), set(requirements))
 
     @unittest.skipUnless(
-        os.environ.get("REPO_PILOT_PACKAGE_TESTS"),
-        "Set REPO_PILOT_PACKAGE_TESTS=1 to build/install static and editable distributions",
+        os.environ.get("CBSETUP_PACKAGE_TESTS"),
+        "Set CBSETUP_PACKAGE_TESTS=1 to build/install static and editable distributions",
     )
     def test_static_and_editable_launchers_and_payload(self):
-        with tempfile.TemporaryDirectory(prefix="repo-pilot packaging ") as temp:
+        with tempfile.TemporaryDirectory(prefix="codebase-agent-setup packaging ") as temp:
             base = Path(temp)
             source = base / "source checkout"
             source.mkdir()
@@ -84,7 +84,7 @@ class DistributionTests(unittest.TestCase):
                 shutil.copy2(file, source / file.name)
             for name in ("src", "project", "preset", "extension"):
                 shutil.copytree(ROOT / name, source / name, ignore=shutil.ignore_patterns("__pycache__"))
-            stale = source / "build/lib/repo_pilot/stale_module.py"
+            stale = source / "build/lib/codebase_agent_setup/stale_module.py"
             stale.parent.mkdir(parents=True)
             stale.write_text("stale = True\n", encoding="utf-8")
             launchers = {}
@@ -98,7 +98,7 @@ class DistributionTests(unittest.TestCase):
                 if mode == "editable":
                     args.append("--editable")
                 subprocess.run(args + [str(source)], check=True, capture_output=True, text=True, encoding="utf-8")
-                launcher = env / ("Scripts/repo-pilot.exe" if os.name == "nt" else "bin/repo-pilot")
+                launcher = env / ("Scripts/codebase-agent-setup.exe" if os.name == "nt" else "bin/codebase-agent-setup")
                 launchers[mode] = launcher
                 info = json.loads(
                     subprocess.check_output([str(launcher), "--version"], cwd=base, text=True, encoding="utf-8")
@@ -171,12 +171,16 @@ class DistributionTests(unittest.TestCase):
                 )
                 self.assertEqual(prepared["action_required"], "full_analysis")
             # A static distribution may be vendored into another project's src/.
-            vendored = base / "consumer-project" / "src" / "repo_pilot"
+            vendored = base / "consumer-project" / "src" / "codebase_agent_setup"
             vendored.parent.mkdir(parents=True)
             (vendored.parent.parent / "pyproject.toml").write_text('[project]\nname="consumer"\n', encoding="utf-8")
             shutil.copytree(locations["static"], vendored)
             check = subprocess.run(
-                [sys.executable, "-c", "from repo_pilot import toolchains; print(toolchains.ROOT); toolchains.lock()"],
+                [
+                    sys.executable,
+                    "-c",
+                    "from codebase_agent_setup import toolchains; print(toolchains.ROOT); toolchains.lock()",
+                ],
                 cwd=base,
                 env=os.environ | {"PYTHONPATH": str(vendored.parent)},
                 capture_output=True,
@@ -186,9 +190,11 @@ class DistributionTests(unittest.TestCase):
             self.assertEqual(check.returncode, 0, check.stderr)
             self.assertEqual(Path(check.stdout.strip()), vendored.resolve())
 
-            code = source / "src/repo_pilot/cli.py"
+            code = source / "src/codebase_agent_setup/cli.py"
             code.write_text(
-                code.read_text(encoding="utf-8").replace("Usage: repo-pilot", "Changed usage: repo-pilot"),
+                code.read_text(encoding="utf-8").replace(
+                    "Usage: codebase-agent-setup", "Changed usage: codebase-agent-setup"
+                ),
                 encoding="utf-8",
             )
             payload = source / "project/AI_CONTEXT.md"

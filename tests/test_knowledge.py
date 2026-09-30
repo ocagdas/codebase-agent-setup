@@ -53,7 +53,7 @@ class KnowledgeTests(unittest.TestCase):
         data = Path(ctx["data_dir"])
         data.mkdir(parents=True)
         (data / "kuzudb").touch()
-        (data / "repo-pilot.json").write_text(
+        (data / "codebase-agent-setup.json").write_text(
             json.dumps({key: ctx[key] for key in ("repo", "revision", "repository_id")}), encoding="utf-8"
         )
 
@@ -160,7 +160,7 @@ class KnowledgeTests(unittest.TestCase):
     def test_imported_paths_map_to_clone_and_reject_missing_source(self):
         ctx = self.ctx()
         self.mark_current(ctx)
-        marker = Path(ctx["data_dir"]) / "repo-pilot.json"
+        marker = Path(ctx["data_dir"]) / "codebase-agent-setup.json"
         marker.write_text(
             json.dumps(
                 json.loads(marker.read_text(encoding="utf-8")) | {"graph_root": "/virtual/bundle/producer-name"}

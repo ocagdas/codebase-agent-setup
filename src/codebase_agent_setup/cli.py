@@ -1,4 +1,4 @@
-"""Installed Repo Pilot command; static wheels and editable checkouts share this entry point."""
+"""Installed codebase-agent-setup command; static wheels and editable checkouts share this entry point."""
 
 import importlib.metadata
 import json
@@ -18,7 +18,7 @@ COMMANDS = {
 def main(argv=None):
     args = sys.argv[1:] if argv is None else list(argv)
     if args == ["--version"]:
-        distribution = importlib.metadata.distribution("repo-pilot")
+        distribution = importlib.metadata.distribution("codebase-agent-setup")
         origin = json.loads(distribution.read_text("direct_url.json") or "{}")
         print(
             json.dumps(
@@ -34,8 +34,8 @@ def main(argv=None):
         return 0
     if not args or args[0] in ("-h", "--help"):
         print(
-            "Usage: repo-pilot {install,configure,knowledge,bootstrap} [arguments]\n"
-            "       repo-pilot --version\nUse repo-pilot COMMAND --help for command options."
+            "Usage: codebase-agent-setup {install,configure,knowledge,bootstrap} [arguments]\n"
+            "       codebase-agent-setup --version\nUse codebase-agent-setup COMMAND --help for command options."
         )
         return 0
     if args[0] not in COMMANDS:

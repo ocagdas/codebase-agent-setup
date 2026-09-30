@@ -18,7 +18,7 @@ python -m pip install -e '.[dev,all]'
 python scripts/prepare_integration.py
 ```
 
-The helper writes `.quality/toolchains/environment.json`. Set its four values in your shell: `SPECIFY_BIN`, `SPECIFY_ALTERNATE_BIN`, `SPECIFY_ALTERNATE_RECORD`, and `REPO_PILOT_PACKAGE_TESTS=1`. Then run:
+The helper writes `.quality/toolchains/environment.json`. Set its four values in your shell: `SPECIFY_BIN`, `SPECIFY_ALTERNATE_BIN`, `SPECIFY_ALTERNATE_RECORD`, and `CBSETUP_PACKAGE_TESTS=1`. Then run:
 
 ```bash
 python scripts/check.py --full

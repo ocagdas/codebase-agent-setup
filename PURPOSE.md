@@ -1,6 +1,6 @@
 # Purpose
 
-Repo Pilot gives LLM coding assistants a reusable baseline for local software projects: project guidance, goals, working conventions and revision-aware knowledge. Its audience includes developers working across large repositories, long-lived release trunks, feature branches, clones and teams.
+codebase-agent-setup gives LLM coding assistants a reusable baseline for local software projects: project guidance, goals, working conventions and revision-aware knowledge. Its audience includes developers working across large repositories, long-lived release trunks, feature branches, clones and teams.
 
 It composes a preset, extension and consumer project payload around official GitHub Spec Kit. The upstream remains unmodified. Installation preserves authored project files; shared defaults can be refined by user, project, checkout and invocation settings. Source access remains available when optional knowledge backends are disabled or unsuitable.
 

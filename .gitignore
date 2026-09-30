@@ -4,6 +4,8 @@ __pycache__/
 
 # Local Spec Kit environments and records
 .venv/
+.venv*/
+.scratch/
 .venv-speckit-*/
 .toolchains/
 *.setup.lock

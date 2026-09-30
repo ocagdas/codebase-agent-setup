@@ -19,3 +19,20 @@ The automated migration path accepts unchanged v6 template files only. Hashes ar
 The current package supports initial installation and recognised baseline migration. General migration of arbitrary active task formats, preset upgrades and merging an existing .specify installation need deliberate review. Keep backups until the new workflow has completed a representative task.
 
 A preserved legacy backup is excluded from Git by the installer. It is for recovery and must not be loaded as current agent guidance.
+
+## Renamed from repo_pilot
+
+This distribution was previously published as `repo_pilot` / `repo-pilot`, and earlier as
+`spec_kit_engineering`. GitHub redirects the old repository URL.
+
+| Before | Now | Compatibility |
+| --- | --- | --- |
+| `repo-pilot` command | `codebase-agent-setup`, short alias `cbsetup` | Reinstall; the old command is removed |
+| `import repo_pilot` | `import codebase_agent_setup` | None; update imports |
+| `<user config>/repo-pilot/config.json` | `<user config>/codebase-agent-setup/config.json` | The old file is still read until the new one exists; move it when convenient |
+| CGC state `repo-pilot.json` | `codebase-agent-setup.json` | The old marker is read; the next index rebuild replaces it |
+| `.repo-pilot-toolchain.json` | `.codebase-agent-setup-toolchain.json` | Rerun setup, or pass an exported record with `--toolchain-record` |
+| `REPO_PILOT_*` environment variables | `CBSETUP_*` | Timeout variables accept the old names; test and CI variables do not |
+| Conda default `spec_kit_engineering` | `codebase-agent-setup` | Existing environments keep working with `--conda-name spec_kit_engineering` |
+
+The Spec Kit extension ID `speckit.engineering` and its skills keep their names, so already-seeded projects are unaffected.

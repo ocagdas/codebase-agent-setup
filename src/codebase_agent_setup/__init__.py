@@ -1,4 +1,4 @@
-"""Repo Pilot tooling distribution."""
+"""codebase-agent-setup tooling distribution."""
 
 from .resources import RESOURCE_ROOT, PACKAGE_ROOT
 

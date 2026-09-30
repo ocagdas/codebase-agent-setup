@@ -13,7 +13,7 @@ From lowest to highest priority:
 5. Ignored `ai_workflow/settings.local.json` for this checkout.
 6. Explicit invocation options.
 
-The user file defaults to `$XDG_CONFIG_HOME/repo-pilot/config.json` (or `~/.config/repo-pilot/config.json`) on Linux, `~/Library/Application Support/repo-pilot/config.json` on macOS, and `%APPDATA%/repo-pilot/config.json` on Windows. `--user-config PATH` selects another user file on all entry points. Missing files are allowed; malformed existing files are errors. These are JSON files to keep installed tooling independent of YAML libraries.
+The user file defaults to `$XDG_CONFIG_HOME/codebase-agent-setup/config.json` (or `~/.config/codebase-agent-setup/config.json`) on Linux, `~/Library/Application Support/codebase-agent-setup/config.json` on macOS, and `%APPDATA%/codebase-agent-setup/config.json` on Windows. `--user-config PATH` selects another user file on all entry points. Missing files are allowed; malformed existing files are errors. These are JSON files to keep installed tooling independent of YAML libraries.
 
 Mappings merge by key, lists replace rather than append, and `null` resets a field to its distribution default. A missing key inherits. `tooling.env_dir` and `cgc.data_dir` are relative to their declaring file, or the current directory for CLI overrides; `~` expands but environment variable interpolation is not performed. Other strings are not resolved as file-relative settings. In particular, cgc.executable is passed as a command name or executable path.
 
@@ -23,7 +23,7 @@ Mappings merge by key, lists replace rather than append, and `null` resets a fie
 | --- | --- | --- |
 | `tooling.mode` | `venv` | `venv`, `native`, or `conda` machine setup |
 | `tooling.env_dir` | `null` | Optional venv directory; null uses the tooling distribution's `.venv` |
-| `tooling.conda_name` | `spec_kit_engineering` | Conda environment name |
+| `tooling.conda_name` | `codebase-agent-setup` | Conda environment name |
 | `speckit.ref` | `null` | Official release/tag or full commit; null uses the distribution pin |
 | `agent.integrations` | `["codex"]` | Installer integrations; codex, cursor-agent, copilot |
 | `knowledge.mode` | `auto` | auto, source, or index; maps to legacy auto, disabled, or required |

@@ -15,9 +15,9 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
-from repo_pilot import cli
-from repo_pilot import install_transaction as transaction
-from repo_pilot import toolchains
+from codebase_agent_setup import cli
+from codebase_agent_setup import install_transaction as transaction
+from codebase_agent_setup import toolchains
 from project.ai_workflow.tools import knowledge_backend as kb
 from project.ai_workflow.tools import repo_bootstrap as bootstrap
 
@@ -119,13 +119,13 @@ class ReviewFixTests(unittest.TestCase):
         self.assertFalse(journal.exists())
 
     def test_toolchain_timeout_terminates_real_probe(self):
-        with patch.dict(os.environ, {"REPO_PILOT_PROBE_TIMEOUT": "0.1"}):
+        with patch.dict(os.environ, {"CBSETUP_PROBE_TIMEOUT": "0.1"}):
             with self.assertRaisesRegex(toolchains.ToolchainError, "timed out"):
                 toolchains.run([sys.executable, "-c", "import time; time.sleep(30)"], probe=True)
 
     def test_invalid_timeout_values_rejected(self):
         for value in ("0", "-1", "nan", "inf", "invalid"):
-            with self.subTest(value=value), patch.dict(os.environ, {"REPO_PILOT_COMMAND_TIMEOUT": value}):
+            with self.subTest(value=value), patch.dict(os.environ, {"CBSETUP_COMMAND_TIMEOUT": value}):
                 with self.assertRaises(toolchains.ToolchainError):
                     toolchains.command_timeout()
 
@@ -247,8 +247,8 @@ class ReviewFixTests(unittest.TestCase):
         self.assertEqual((self.repo / "existing").read_text(encoding="utf-8"), "new content")
 
     def test_backend_state_and_internal_errors_have_actionable_safe_diagnostics(self):
-        (self.repo / "repo-pilot.json").write_text("[]", encoding="utf-8")
-        with self.assertRaisesRegex(kb.SettingsError, "repo-pilot.json: invalid CGC state"):
+        (self.repo / "codebase-agent-setup.json").write_text("[]", encoding="utf-8")
+        with self.assertRaisesRegex(kb.SettingsError, "codebase-agent-setup.json: invalid CGC state"):
             kb.state({"data_dir": str(self.repo)})
         output = io.StringIO()
         with (
@@ -270,7 +270,7 @@ class RecoveryProcessTests(unittest.TestCase):
 import sys, time
 from pathlib import Path
 sys.path.insert(0, str(Path.cwd() / "src"))
-from repo_pilot import install_transaction as t
+from codebase_agent_setup import install_transaction as t
 root, source = (Path(value).resolve() for value in sys.argv[1:])
 original = t.atomic_copy
 def pause(source, destination):
@@ -357,7 +357,7 @@ class CommandCancellationTests(unittest.TestCase):
                 + "]); time.sleep(30)"
             )
             parent = (
-                "import sys; from pathlib import Path; sys.path.insert(0, str(Path.cwd() / 'src')); from repo_pilot import toolchains\ntry: toolchains.run([sys.executable,'-c',"
+                "import sys; from pathlib import Path; sys.path.insert(0, str(Path.cwd() / 'src')); from codebase_agent_setup import toolchains\ntry: toolchains.run([sys.executable,'-c',"
                 + repr(command)
                 + "])\nexcept KeyboardInterrupt: print('cancelled',flush=True)"
             )

@@ -1,6 +1,6 @@
-# Spec Kit engineering package
+# codebase-agent-setup
 
-Choose a **static** snapshot or **editable** source-linked installation, with `minimal`, `cgc`, `sourcegraph` or `all` dependencies. See [installation modes](docs/user/installation-modes.md). Setup now installs the `repo-pilot` command as well as Spec Kit.
+Choose a **static** snapshot or **editable** source-linked installation, with `minimal`, `cgc`, `sourcegraph` or `all` dependencies. See [installation modes](docs/user/installation-modes.md). Setup now installs the `codebase-agent-setup` command as well as Spec Kit.
 
 This package adapts the official [GitHub Spec Kit](https://github.com/github/spec-kit) for embedded C and C++, Python and data science. It uses upstream v1.0.4 with a composable preset, an extension and project configuration. The official upstream remains unmodified. This custom package is not an official GitHub product.
 
@@ -105,7 +105,7 @@ Optional CodeGraphContext and Sourcegraph retrieval now has a default-off select
 
 ## Contributing and maintenance
 
-Repo Pilot is MIT-licensed. See [LICENSE](LICENSE), [NOTICE.md](NOTICE.md),
+codebase-agent-setup is MIT-licensed. See [LICENSE](LICENSE), [NOTICE.md](NOTICE.md),
 [CONTRIBUTING.md](CONTRIBUTING.md), [SUPPORT.md](SUPPORT.md),
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md).
 

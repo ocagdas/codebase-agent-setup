@@ -1,8 +1,8 @@
 # Quickstart: install, configure, and use Spec Kit
 
-Choose a **static** snapshot or **editable** source-linked installation, with `minimal`, `cgc`, `sourcegraph` or `all` dependencies. See [installation modes](docs/user/installation-modes.md). Setup now installs the `repo-pilot` command as well as Spec Kit.
+Choose a **static** snapshot or **editable** source-linked installation, with `minimal`, `cgc`, `sourcegraph` or `all` dependencies. See [installation modes](docs/user/installation-modes.md). Setup now installs the `codebase-agent-setup` command as well as Spec Kit.
 
-This tutorial installs this repository's engineering package around official GitHub Spec Kit, configures a software project, and walks through a first feature. It describes the current package, which defaults to Specify CLI 1.0.4. Personal settings hierarchies are available; see [the settings guide](project/ai_workflow/settings.md). Local Spec Kit version overrides are available in [docs/user/toolchain-versions.md](docs/user/toolchain-versions.md). Shared graph downloads and automatic trunk detection remain planned in [ROADMAP.md](ROADMAP.md).
+This tutorial installs codebase-agent-setup around official GitHub Spec Kit, configures a software project, and walks through a first feature. It describes the current package, which defaults to Specify CLI 1.0.4. Personal settings hierarchies are available; see [the settings guide](project/ai_workflow/settings.md). Local Spec Kit version overrides are available in [docs/user/toolchain-versions.md](docs/user/toolchain-versions.md). Shared graph downloads and automatic trunk detection remain planned in [ROADMAP.md](ROADMAP.md).
 
 ## 1. Prepare two separate directories
 
@@ -10,7 +10,7 @@ Keep this tooling repository outside the software project you want agents to wor
 
 ```text
 work/
-  repo_pilot/       # This tooling distribution
+  codebase-agent-setup/       # This tooling distribution
   my_project/      # Your software repository
 ```
 
@@ -20,7 +20,7 @@ The examples use Copilot. Replace `copilot` with `codex` or `cursor-agent` as ne
 
 ## 2. Install machine tooling
 
-Choose **one** method. Run from the `repo_pilot` directory and replace example paths with your own.
+Choose **one** method. Run from the `codebase-agent-setup` directory and replace example paths with your own.
 
 | Method | Use when | Prerequisites |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ All four default to the same pinned source and install the same package; explici
 Linux/macOS:
 
 ```bash
-cd /absolute/path/to/repo_pilot
+cd /absolute/path/to/codebase-agent-setup
 python3 --version
 git --version
 python3 setup_tooling.py --mode venv
@@ -47,7 +47,7 @@ python3 setup_tooling.py --mode venv --apply
 Windows PowerShell:
 
 ```powershell
-Set-Location C:\work\repo_pilot
+Set-Location C:\work\codebase-agent-setup
 py -3 --version
 git --version
 py -3 setup_tooling.py --mode venv
@@ -59,7 +59,7 @@ The first setup command previews dependency installation; `--apply` executes it 
 
 ### Option B: native Python
 
-Linux/macOS, from `repo_pilot`:
+Linux/macOS, from `codebase-agent-setup`:
 
 ```bash
 python3 setup_tooling.py --mode native
@@ -79,11 +79,11 @@ Outside an active venv or Conda environment, the helper installs with pip's user
 
 ### Option C: Conda / Miniforge
 
-From `repo_pilot`, in an initialised Conda shell on Linux/macOS or an Anaconda/Miniforge Prompt on Windows:
+From `codebase-agent-setup`, in an initialised Conda shell on Linux/macOS or an Anaconda/Miniforge Prompt on Windows:
 
 ```text
-conda env create --name spec_kit_engineering --file environment.yml
-conda activate spec_kit_engineering
+conda env create --name codebase-agent-setup --file environment.yml
+conda activate codebase-agent-setup
 specify version
 ```
 
@@ -109,15 +109,15 @@ Activation must run in your current shell. The Python helper cannot change its p
 python setup_tooling.py --mode conda --conda-name my_spec_tools --apply && conda activate my_spec_tools
 ```
 
-If activation reports that the shell is not initialised, follow [Conda activation troubleshooting](INSTALLATION.md#conda-activation-troubleshooting). For scripts or an unactivated shell, `conda run -n my_spec_tools specify version` remains available. If `spec_kit_engineering` already exists, verify its CLI version instead of rerunning creation. See [INSTALLATION.md](INSTALLATION.md) for deliberate updates or a different environment name.
+If activation reports that the shell is not initialised, follow [Conda activation troubleshooting](INSTALLATION.md#conda-activation-troubleshooting). For scripts or an unactivated shell, `conda run -n my_spec_tools specify version` remains available. If `codebase-agent-setup` already exists, verify its CLI version instead of rerunning creation. See [INSTALLATION.md](INSTALLATION.md) for deliberate updates or a different environment name.
 
 ### Option D: Docker
 
-From `repo_pilot`, with Docker running:
+From `codebase-agent-setup`, with Docker running:
 
 ```text
-docker build -t spec_kit_engineering:1.1 .
-docker run --rm --entrypoint specify spec_kit_engineering:1.1 version
+docker build -t codebase-agent-setup:1.1 .
+docker run --rm --entrypoint specify codebase-agent-setup:1.1 version
 ```
 
 The image installs Python, Git and pinned Spec Kit internally. It runs the project installer; it does not launch your IDE or coding agent. Step 3 mounts your project into the container. Later local agent bootstrap still requires Python and Git in that agent's environment.
@@ -126,7 +126,7 @@ For custom environment paths and further options, see [INSTALLATION.md](INSTALLA
 
 ## 3. Install the project files
 
-Still in `repo_pilot`, use the commands matching your choice in step 2. Preview uses disposable staging but does not write to the target project.
+Still in `codebase-agent-setup`, use the commands matching your choice in step 2. Preview uses disposable staging but does not write to the target project.
 
 ### With venv
 
@@ -191,19 +191,19 @@ Ensure the target directory exists. First run your platform's command below **wi
 Linux, preserving host file ownership:
 
 ```bash
-docker run --rm --user "$(id -u):$(id -g)" --env XDG_CACHE_HOME=/tmp/cache --mount "type=bind,source=/absolute/path/to/my_project,target=/repo" spec_kit_engineering:1.1 /repo --integration copilot --apply
+docker run --rm --user "$(id -u):$(id -g)" --env XDG_CACHE_HOME=/tmp/cache --mount "type=bind,source=/absolute/path/to/my_project,target=/repo" codebase-agent-setup:1.1 /repo --integration copilot --apply
 ```
 
 macOS:
 
 ```bash
-docker run --rm --mount "type=bind,source=/absolute/path/to/my_project,target=/repo" spec_kit_engineering:1.1 /repo --integration copilot --apply
+docker run --rm --mount "type=bind,source=/absolute/path/to/my_project,target=/repo" codebase-agent-setup:1.1 /repo --integration copilot --apply
 ```
 
 Windows PowerShell:
 
 ```powershell
-docker run --rm --mount "type=bind,source=C:\work\my_project,target=/repo" spec_kit_engineering:1.1 /repo --integration copilot --apply
+docker run --rm --mount "type=bind,source=C:\work\my_project,target=/repo" codebase-agent-setup:1.1 /repo --integration copilot --apply
 ```
 
 Docker Desktop must have access to the host directory. The installer writes into the mounted project, so the generated files remain after the container exits.

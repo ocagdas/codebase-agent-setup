@@ -10,7 +10,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
-from repo_pilot import toolchains
+from codebase_agent_setup import toolchains
 
 sys.path.insert(0, str(ROOT / "project/ai_workflow/tools"))
 from settings import resolve

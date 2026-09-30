@@ -1,6 +1,6 @@
 # Package versions and tags
 
-Repo Pilot follows the common [repository contract](REPOSITORY_STRUCTURE.md), with `pyproject.toml [project].version` mirrored in `upstream.lock.json package_version`. Package bumps leave the official Spec Kit pin, requirements.txt, preset and extension versions unchanged. Consumer toolchain overrides are independent.
+codebase-agent-setup follows the common [repository contract](REPOSITORY_STRUCTURE.md), with `pyproject.toml [project].version` mirrored in `upstream.lock.json package_version`. Package bumps leave the official Spec Kit pin, requirements.txt, preset and extension versions unchanged. Consumer toolchain overrides are independent.
 
 ## Commands and outputs
 
@@ -25,7 +25,7 @@ Local bump commands edit the two mirrors but do not commit/push. Use a clean, cu
 
 ## Trunk and automatic policy
 
-Repo Pilot's selected release trunk defaults to `main`. `REPOSITORY_TRUNK` is the common override for intentional policy changes. Checks still cover all branches. Update the trunk's protection rules when changing the selection; configuration alone does not grant a bypass.
+codebase-agent-setup's selected release trunk defaults to `main`. `REPOSITORY_TRUNK` is the common override for intentional policy changes. Checks still cover all branches. Update the trunk's protection rules when changing the selection; configuration alone does not grant a bypass.
 
 Ordinary PRs must leave package version values unchanged. The PR check compares against the merge base so a later trunk version bump does not invalidate an unchanged stale feature branch. After a qualifying trunk merge passes Quality gate, CI increments the patch and tags it. Maintainer-selected higher versions on a direct trunk push are tagged without a second bump. Direct code-only pushes run checks without a bump.
 
@@ -39,8 +39,8 @@ A version commit and tag are pushed together using `git push --atomic`, without 
 ## GitHub activation
 
 1. Install a repository-scoped GitHub App with Contents read/write permission.
-2. Keep existing variable `REPO_PILOT_VERSIONING_APP_ID` and secret `REPO_PILOT_VERSIONING_APP_PRIVATE_KEY` (PEM key). No credential names changed during standardization. The reusable workflow passes the same secret through its internal `versioning-private-key` argument.
-3. Set `REPO_PILOT_VERSIONING_ACTOR` to the App bot login for commit identity; its default remains `repo-pilot-versioning[bot]`. Loop prevention now relies on the exact existing tag, rather than the former `[skip ci-version]` message/actor guard. Existing tagged commits remain no-ops; no message migration is needed.
+2. Keep existing variable `CBSETUP_VERSIONING_APP_ID` and secret `CBSETUP_VERSIONING_APP_PRIVATE_KEY` (PEM key). No credential names changed during standardization. The reusable workflow passes the same secret through its internal `versioning-private-key` argument.
+3. Set `CBSETUP_VERSIONING_ACTOR` to the App bot login for commit identity; its default remains `codebase-agent-setup-versioning[bot]`. Loop prevention now relies on the exact existing tag, rather than the former `[skip ci-version]` message/actor guard. Existing tagged commits remain no-ops; no message migration is needed.
 4. Require the stable **Quality gate** check on contributor PRs. Allow only the dedicated App to make the necessary version commit/new tag under the selected trunk and `v*` rules. Keep force-push/tag-update/deletion restrictions. Explicit maintainer version commits require authorized repository rules.
 5. Run a real trunk PR merge and inspect the version workflow and tag-triggered Release readiness. Missing App settings fail visibly when an action is needed. Hosted activation tasks remain in [TODO.md](TODO.md).
 
@@ -63,12 +63,12 @@ Tags trigger full release-readiness checks and validated wheel/source artifacts.
 ## Shared implementation and published verification
 
 [REPOSITORY_STRUCTURE.md](REPOSITORY_STRUCTURE.md) links the authoritative shared
-interfaces and conformance suite. Repo Pilot keeps its mirror/build adapter and leaves
+interfaces and conformance suite. codebase-agent-setup keeps its mirror/build adapter and leaves
 public publication disabled. The standard design owns cross-repository semantics;
-this document owns Repo Pilot's operational settings and recovery commands.
+this document owns codebase-agent-setup's operational settings and recovery commands.
 
 `verify-release.yml` is dormant by default. For an existing published release, set
-`REPO_PILOT_VERIFY_PUBLISHED_RELEASES=true` and dispatch with its tag. It verifies the
+`CBSETUP_VERIFY_PUBLISHED_RELEASES=true` and dispatch with its tag. It verifies the
 downloaded wheel, CLI and consumer resources; it does not enable a publisher or replace
 assets. See [CI.md](CI.md) for build qualification and [VALIDATION.md](VALIDATION.md)
 for actual evidence. Hosted setup/state belongs to the [setup guide](docs/development/github-policy-setup.md).

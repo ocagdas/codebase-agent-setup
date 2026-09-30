@@ -3,7 +3,7 @@
 This file owns repository layout and documentation responsibilities. The versioned
 [shared contract](standards/repository/v1/contract.json), its adjacent schemas and
 [design](docs/development/repository-standard-design.md) own cross-repository automation
-interfaces. `repository-standard.json` supplies Repo Pilot's adapter values; run
+interfaces. `repository-standard.json` supplies codebase-agent-setup's adapter values; run
 `python scripts/check_repository_standard.py` to check them. Shared files are vendored,
 with hashes in `standards/repository/v1/bundle.json`; runtime sibling imports are prohibited.
 
@@ -11,7 +11,7 @@ with hashes in `standards/repository/v1/bundle.json`; runtime sibling imports ar
 
 | Location | Responsibility |
 |---|---|
-| `src/repo_pilot/` | Importable tooling runtime and installed CLI |
+| `src/codebase_agent_setup/` | Importable tooling runtime and installed CLI |
 | `install.py`, `configure.py`, `knowledge.py` | Small source-checkout launchers |
 | `setup_tooling.py`, `docker_install.py` | Machine/container setup entry points |
 | `project/` | Single authored consumer payload, including standalone tools |
@@ -40,7 +40,7 @@ Builds, credentials, caches, overrides and generated evidence remain ignored loc
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contributor setup and review expectations |
 | [BRANCHING.md](BRANCHING.md) | Shared branch/version convention |
 | [CI.md](CI.md) | Local/hosted quality commands, matrix and evidence consumption |
-| [VERSIONING.md](VERSIONING.md) | Repo Pilot version mirrors, release commands, App configuration and recovery |
+| [VERSIONING.md](VERSIONING.md) | codebase-agent-setup version mirrors, release commands, App configuration and recovery |
 | [GitHub setup](docs/development/github-policy-setup.md) | Hosted rules and activation setup |
 | [HANDOFF.md](HANDOFF.md) | Safe resumption and protected inputs |
 | [docs/index.md](docs/index.md) | Navigation |
