@@ -25,3 +25,8 @@ dist/
 .pytest_cache/
 
 .venv-dev/
+/.cbsetup/install.lock
+/.cbsetup/transaction/
+/.cbsetup/retired-*/
+.ai_migration_backup/
+/ai_workflow/settings.local.json

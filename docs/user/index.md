@@ -1,10 +1,9 @@
 # User guides
 
-Follow the authoritative [quickstart](../../QUICKSTART.md) and [platform installation guide](../../INSTALLATION.md), then use the focused guides:
+Follow the [README](../../README.md) for installation and the quickstart, then use the focused guides:
 
-- [Static/editable installation and optional dependencies](installation-modes.md).
-- [Spec Kit selection, records and upgrades](toolchain-versions.md).
-- [Version 6 migration](migration.md).
-- Consumer-installed [settings](../../project/ai_workflow/settings.md) and [backend setup/sharing](../../project/ai_workflow/knowledge_backends.md).
+- [Switching agent tools and keeping handovers current](switching-agent-tools.md): the tool-neutral guide,
+  `--no-speckit`, `--adopt` and `handover.path`.
+- Consumer-installed [settings](../../project/ai_workflow/settings.md) and [repository knowledge](../../project/ai_workflow/knowledge.md).
 
 The consumer guides stay in project/ because installation includes them at those paths. Commands run from the tooling repository root unless the guide explicitly selects a consumer directory.

@@ -1,6 +1,6 @@
 # Getting help
 
-Start with [QUICKSTART.md](QUICKSTART.md), [INSTALLATION.md](INSTALLATION.md) and [docs/index.md](docs/index.md).
+Start with [README.md](README.md) and [docs/index.md](docs/index.md).
 
 Use repository issues for reproducible bugs and feature proposals. Select the
 bug report or feature request form. Include the project version or commit, Python

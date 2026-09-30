@@ -1,2 +1,0 @@
-# Official GitHub Spec Kit, pinned to the validated source commit.
-specify-cli @ git+https://github.com/github/spec-kit.git@cb610277fdea781fcfa83d20522c2db37c94068d

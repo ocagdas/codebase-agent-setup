@@ -22,30 +22,22 @@ class FinalReviewTests(unittest.TestCase):
     def test_installer_passes_planning_snapshot_to_transaction(self):
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary).resolve()
-            target, stage, payload = base / "repo", base / "stage", base / "payload"
+            target, payload = base / "repo", base / "payload"
             target.mkdir()
-            stage.mkdir()
             (payload / "project").mkdir(parents=True)
-            (payload / "legacy_v6_files.json").write_text("{}")
+            # The payload ships one managed file that already exists unchanged in the target.
+            (payload / "project/managed.txt").write_text("original")
             (target / "managed.txt").write_text("original")
-            (stage / "managed.txt").write_text("original")
             apply = transaction.apply_writes
 
             def edit_before_write(repo, writes, **kwargs):
                 (repo / "managed.txt").write_text("authored after planning")
                 return apply(repo, writes, **kwargs)
 
-            args = SimpleNamespace(repo=target, apply=True, integration=["codex"], specify=None, migrate_v6=False)
+            args = SimpleNamespace(repo=target, apply=True, integration=["codex"], user_config=None)
             with (
                 patch.object(install, "ROOT", payload),
-                patch.object(
-                    install,
-                    "resolve",
-                    return_value={"settings": {"agent": {"integrations": ["codex"]}, "speckit": {"ref": None}}},
-                ),
-                patch.object(install.toolchains, "resolve_selection", return_value={}),
-                patch.object(install.toolchains, "discover_cli", return_value=[]),
-                patch.object(install.toolchains, "stage_package", return_value=(stage, {})),
+                patch.object(install, "resolve", return_value={"settings": {"agent": {"integrations": ["codex"]}}}),
                 patch.object(transaction, "apply_writes", side_effect=edit_before_write),
                 contextlib.redirect_stdout(io.StringIO()),
             ):

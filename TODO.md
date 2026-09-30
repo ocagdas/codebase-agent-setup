@@ -4,6 +4,8 @@ This is the tooling distribution's actionable backlog. Consumer feature work sti
 
 ## Priority now (P1 stabilization)
 
+- Qualify dev/mvp_0.30-consolidation on hosted CI, including Windows and the strict packaging profile. Spec Kit provisioning and its toolchain gates are retired.
+
 - Configure the versioning App variables/secret and narrowly scoped App bypass described in VERSIONING.md; branch/tag rules are active. Enable REPOSITORY_VERSIONING_ENABLED only after App setup.
 - Run hosted CI and tag-triggered release readiness; prove the active Quality gate rule blocks failing PRs and verify commit/run evidence and App publication on the selected trunk.
 - Execute the declared macOS/Windows matrix and record results. Broaden native installation, real backend and live-agent evidence only through actual runs.
@@ -14,7 +16,7 @@ This is the tooling distribution's actionable backlog. Consumer feature work sti
 - Select a representative repository, languages, build variants, release/RC trunks and real agent clients for a repeatable pilot.
 - Measure source-only versus assisted correctness, cold generation, warm startup, incremental refresh, retrieval accuracy, storage and actual agent token use; agree numerical targets from that baseline.
 - Extend artifact identity with build inputs, generator compatibility, coverage, provenance, exact overlay bases and partial-extraction behavior. Specify replacement/tombstone and dependency invalidation semantics.
-- Validate bounded definitions, references, dependency and change queries against real source/build evidence; exercise a production Sourcegraph instance.
+- Measure the delivered multi-indexer query fan-out and `--indexer` narrowing on real mixed-language tasks.
 - Connect semantic refresh/query status to bootstrap through validated operations and effective source/index/auto, origin and update/fetch policies. Preserve read-only/source fallback behavior.
 - Implement dirty-worktree semantic updates, rename/deletion/reversion handling and isolated concurrent worktrees. Compare results with a fresh index.
 

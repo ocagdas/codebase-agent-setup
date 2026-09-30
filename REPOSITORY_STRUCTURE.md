@@ -32,7 +32,6 @@ Builds, credentials, caches, overrides and generated evidence remain ignored loc
 |---|---|
 | [README.md](README.md) | Product entry point and links to guides |
 | [PURPOSE.md](PURPOSE.md) | Mission, scope and non-goals |
-| [QUICKSTART.md](QUICKSTART.md), [INSTALLATION.md](INSTALLATION.md) | Tutorial and installation methods respectively |
 | [STATUS.md](STATUS.md) | Current capabilities and functional limitations |
 | [VALIDATION.md](VALIDATION.md) | Latest tested revision/delta, commands, results and unverified scope |
 | [ROADMAP.md](ROADMAP.md) | Milestones and acceptance criteria |

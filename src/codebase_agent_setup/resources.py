@@ -7,7 +7,7 @@ import tomllib
 def resource_root(package_root):
     package_root = Path(package_root).resolve()
     # Bundled resources take precedence regardless of the install directory name.
-    if (package_root / "upstream.lock.json").is_file():
+    if (package_root / "project/AI_CONTEXT.md").is_file():
         return package_root
     checkout = package_root.parents[1]
     if package_root.parent.name == "src":
@@ -19,7 +19,6 @@ def resource_root(package_root):
         if (
             isinstance(project, dict)
             and project.get("name") == "codebase-agent-setup"
-            and (checkout / "upstream.lock.json").is_file()
             and (checkout / "project/ai_workflow/tools/settings.py").is_file()
         ):
             return checkout

@@ -1,4 +1,4 @@
-"""Installed codebase-agent-setup command; static wheels and editable checkouts share this entry point."""
+"""The single cbsetup command surface; static wheels and editable checkouts share this entry point."""
 
 import importlib.metadata
 import json
@@ -8,11 +8,19 @@ import sys
 from .resources import PACKAGE_ROOT as ROOT, RESOURCE_ROOT
 
 COMMANDS = {
-    "install": "install",
-    "configure": "project.ai_workflow.tools.settings",
-    "knowledge": "project.ai_workflow.tools.knowledge_backend",
-    "bootstrap": "project.ai_workflow.tools.repo_bootstrap",
+    "install": ("install", "Seed or upgrade a repository's tool-neutral agent guide"),
+    "capsule": ("capsule", "Capture, inspect and replay a setup; always redacted"),
+    "fleet": ("fleet", "Status and mass apply across many repositories"),
+    "handover": ("project.ai_workflow.tools.validate_handover", "Locate and validate a repository's handover document"),
+    "configure": ("project.ai_workflow.tools.settings", "Inspect and change settings"),
+    "knowledge": ("project.ai_workflow.tools.knowledge", "Build, share and query a repository index"),
+    "bootstrap": ("project.ai_workflow.tools.repo_bootstrap", "Optional local inventories"),
 }
+USAGE = "\n".join(
+    ["Usage: codebase-agent-setup <command> [arguments]", "       codebase-agent-setup --version", "", "Commands:"]
+    + [f"  {name:<10} {help}" for name, (_, help) in COMMANDS.items()]
+    + ["", "Run codebase-agent-setup <command> --help for a command's options."]
+)
 
 
 def main(argv=None):
@@ -33,14 +41,11 @@ def main(argv=None):
         )
         return 0
     if not args or args[0] in ("-h", "--help"):
-        print(
-            "Usage: codebase-agent-setup {install,configure,knowledge,bootstrap} [arguments]\n"
-            "       codebase-agent-setup --version\nUse codebase-agent-setup COMMAND --help for command options."
-        )
+        print(USAGE)
         return 0
     if args[0] not in COMMANDS:
         print("Unknown command: " + args[0], file=sys.stderr)
+        print(USAGE, file=sys.stderr)
         return 2
-    name = COMMANDS[args[0]]
-    module = importlib.import_module("." + name, __package__)
+    module = importlib.import_module("." + COMMANDS[args[0]][0], __package__)
     return module.main(args[1:])

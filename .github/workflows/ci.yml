@@ -76,7 +76,7 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install -e '.[dev,sourcegraph]'
+      - run: python -m pip install -e '.[dev]'
       - run: python scripts/run_tests.py --report .quality/unit.json
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
@@ -97,9 +97,10 @@ jobs:
           python-version: '3.13'
       - name: Initialize integration failure evidence
         run: python -c "from scripts.check import initialize_reports; initialize_reports()"
-      - run: python -m pip install -e '.[dev,all]'
-      - run: python scripts/prepare_integration.py --github-env
+      - run: python -m pip install -e '.[dev]'
       - run: python scripts/check.py --full
+        env:
+          CBSETUP_PACKAGE_TESTS: '1'
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:

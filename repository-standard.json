@@ -7,7 +7,7 @@
     "integration",
     "artifacts"
   ],
-  "version_mirror": "upstream.lock.json",
+  "version_mirror": "pyproject.toml",
   "trunk_variable": "REPOSITORY_TRUNK",
   "publication": "disabled",
   "license_profile": "MIT"

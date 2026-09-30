@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "state_directory",
+    "layer_storage",
+    "branch_selection",
+    "source_selection",
+    "global_invalidation_globs",
+    "header_globs",
+    "semantic_index",
+    "analysis"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "state_directory": {
+      "type": "string"
+    },
+    "layer_storage": {
+      "type": "object",
+      "required": [
+        "base_directory",
+        "matching_branch_directory",
+        "other_branch_directory",
+        "branch_overlay_directory",
+        "worktree_overlay_directory",
+        "query_precedence"
+      ],
+      "properties": {
+        "base_directory": {
+          "type": "string"
+        },
+        "matching_branch_directory": {
+          "type": "string"
+        },
+        "other_branch_directory": {
+          "type": "string"
+        },
+        "branch_overlay_directory": {
+          "type": "string"
+        },
+        "worktree_overlay_directory": {
+          "type": "string"
+        },
+        "query_precedence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "branch_selection": {
+      "type": "object",
+      "required": [
+        "include_regex",
+        "exclude_regex",
+        "non_matching_branch_policy",
+        "base_ref_candidates"
+      ],
+      "properties": {
+        "include_regex": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude_regex": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "non_matching_branch_policy": {
+          "type": "string"
+        },
+        "base_ref_candidates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "source_selection": {
+      "type": "object",
+      "required": [
+        "include_globs",
+        "include_root_files",
+        "exclude_globs"
+      ],
+      "properties": {
+        "include_globs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "include_root_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude_globs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "global_invalidation_globs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "header_globs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "semantic_index": {
+      "type": "object",
+      "required": [
+        "mode",
+        "backend",
+        "create_when_missing",
+        "compile_database_candidates",
+        "manifest_file",
+        "query_command",
+        "base_update_command",
+        "branch_overlay_update_command",
+        "worktree_overlay_update_command",
+        "fallback_when_unavailable",
+        "base_remote_namespace",
+        "matching_branch_remote_namespace",
+        "publish_matching_branch_overlays",
+        "publish_worktree_overlays",
+        "base_updates_require_trusted_external_workflow"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string"
+        },
+        "backend": {
+          "type": "string"
+        },
+        "create_when_missing": {
+          "type": "boolean"
+        },
+        "compile_database_candidates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "manifest_file": {
+          "type": "string"
+        },
+        "query_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "base_update_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "branch_overlay_update_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "worktree_overlay_update_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fallback_when_unavailable": {
+          "type": "string"
+        },
+        "base_remote_namespace": {
+          "type": "string"
+        },
+        "matching_branch_remote_namespace": {
+          "type": "string"
+        },
+        "publish_matching_branch_overlays": {
+          "type": "boolean"
+        },
+        "publish_worktree_overlays": {
+          "type": "boolean"
+        },
+        "base_updates_require_trusted_external_workflow": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "analysis": {
+      "type": "object",
+      "required": [
+        "repository_analysis_file",
+        "file_index_file",
+        "pending_request_file",
+        "branch_delta_file",
+        "branch_delta_data_file",
+        "delta_directory"
+      ],
+      "properties": {
+        "repository_analysis_file": {
+          "type": "string"
+        },
+        "file_index_file": {
+          "type": "string"
+        },
+        "pending_request_file": {
+          "type": "string"
+        },
+        "branch_delta_file": {
+          "type": "string"
+        },
+        "branch_delta_data_file": {
+          "type": "string"
+        },
+        "delta_directory": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -17,8 +17,6 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 from codebase_agent_setup import cli
 from codebase_agent_setup import install_transaction as transaction
-from codebase_agent_setup import toolchains
-from project.ai_workflow.tools import knowledge_backend as kb
 from project.ai_workflow.tools import repo_bootstrap as bootstrap
 
 
@@ -118,17 +116,6 @@ class ReviewFixTests(unittest.TestCase):
         self.assertEqual((self.repo / "existing").read_text(encoding="utf-8"), "new content")
         self.assertFalse(journal.exists())
 
-    def test_toolchain_timeout_terminates_real_probe(self):
-        with patch.dict(os.environ, {"CBSETUP_PROBE_TIMEOUT": "0.1"}):
-            with self.assertRaisesRegex(toolchains.ToolchainError, "timed out"):
-                toolchains.run([sys.executable, "-c", "import time; time.sleep(30)"], probe=True)
-
-    def test_invalid_timeout_values_rejected(self):
-        for value in ("0", "-1", "nan", "inf", "invalid"):
-            with self.subTest(value=value), patch.dict(os.environ, {"CBSETUP_COMMAND_TIMEOUT": value}):
-                with self.assertRaises(toolchains.ToolchainError):
-                    toolchains.command_timeout()
-
     def test_callable_cli_leaves_process_state_unchanged(self):
         before = (list(sys.argv), list(sys.path), dict(os.environ))
         with contextlib.redirect_stdout(io.StringIO()):
@@ -221,22 +208,6 @@ class ReviewFixTests(unittest.TestCase):
         self.assertNotIn("deleted.py", paths)
         self.assertIn("renamed.py", paths)
 
-    def test_discovery_continues_after_timed_out_candidate(self):
-        settings = {"tooling": {"env_dir": str(self.root), "mode": "venv"}}
-        first = self.root / "first"
-        second = self.root / "second"
-        first.touch()
-        second.touch()
-        with (
-            patch.object(toolchains, "environment_path", return_value=self.root),
-            patch.object(toolchains, "cli_in", return_value=first),
-            patch.object(toolchains.sysconfig, "get_path", return_value=str(self.root)),
-            patch.object(toolchains.os, "get_exec_path", return_value=[str(self.root)]),
-            patch.object(toolchains.shutil, "which", return_value=str(second)),
-            patch.object(toolchains, "probe_cli", side_effect=[toolchains.ToolchainError("timed out"), "verified"]),
-        ):
-            self.assertEqual(toolchains.discover_cli(settings, {}), str(second))
-
     def test_recovery_checks_all_backups_before_changing_targets(self):
         self.interrupt_transaction()
         journal = self.repo / transaction.JOURNAL
@@ -245,19 +216,6 @@ class ReviewFixTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "Damaged installation backup"):
                 transaction.recover(self.repo, apply=True)
         self.assertEqual((self.repo / "existing").read_text(encoding="utf-8"), "new content")
-
-    def test_backend_state_and_internal_errors_have_actionable_safe_diagnostics(self):
-        (self.repo / "codebase-agent-setup.json").write_text("[]", encoding="utf-8")
-        with self.assertRaisesRegex(kb.SettingsError, "codebase-agent-setup.json: invalid CGC state"):
-            kb.state({"data_dir": str(self.repo)})
-        output = io.StringIO()
-        with (
-            patch.object(kb, "context", side_effect=AttributeError("private token")),
-            contextlib.redirect_stderr(output),
-        ):
-            self.assertEqual(kb.main(["status"]), 2)
-        self.assertIn("status failed unexpectedly (AttributeError)", output.getvalue())
-        self.assertNotIn("private token", output.getvalue())
 
 
 class RecoveryProcessTests(unittest.TestCase):
@@ -315,7 +273,7 @@ t.apply_writes(root, {'existing': source})
             transaction.apply_writes(self.repo, {"existing": self.source})
         self.assertFalse((self.repo / transaction.JOURNAL).exists())
         transaction.apply_writes(self.repo, {"new": self.source})
-        self.assertEqual(list((self.repo / ".specify").glob("engineering-retired-*")), [])
+        self.assertEqual(list((self.repo / transaction.STATE).glob(transaction.RETIRED + "*")), [])
         self.assertTrue((self.repo / "new").exists())
 
     def test_windows_lock_uses_byte_locking_without_process_signals(self):
@@ -334,73 +292,8 @@ t.apply_writes(root, {'existing': source})
         self.assertEqual([call.args for call in locking.call_args_list], [(7, 2, 1), (7, 0, 1)])
 
 
-class CommandCancellationTests(unittest.TestCase):
-    @unittest.skipUnless(os.name == "posix", "POSIX signal/session behavior")
-    def test_ctrl_c_stops_command_and_descendant_before_returning(self):
-        import signal
-        import time
-
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            ready = root / "ready"
-            done = root / "done"
-            worker = (
-                "import time; from pathlib import Path; Path("
-                + repr(str(ready))
-                + ").touch(); time.sleep(1.5); Path("
-                + repr(str(done))
-                + ").touch()"
-            )
-            command = (
-                "import subprocess,sys,time; subprocess.Popen([sys.executable,'-c',"
-                + repr(worker)
-                + "]); time.sleep(30)"
-            )
-            parent = (
-                "import sys; from pathlib import Path; sys.path.insert(0, str(Path.cwd() / 'src')); from codebase_agent_setup import toolchains\ntry: toolchains.run([sys.executable,'-c',"
-                + repr(command)
-                + "])\nexcept KeyboardInterrupt: print('cancelled',flush=True)"
-            )
-            process = subprocess.Popen(
-                [sys.executable, "-u", "-c", parent],
-                cwd=ROOT,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                encoding="utf-8",
-            )
-            try:
-                deadline = time.monotonic() + 5
-                while not ready.exists() and time.monotonic() < deadline:
-                    time.sleep(0.02)
-                self.assertTrue(ready.exists())
-                process.send_signal(signal.SIGINT)
-                output, error = process.communicate(timeout=5)
-                self.assertEqual(process.returncode, 0, error)
-                self.assertIn("cancelled", output)
-                time.sleep(1.7)
-                self.assertFalse(done.exists(), "descendant continued writing after cancellation")
-            finally:
-                if process.poll() is None:
-                    process.kill()
-                process.communicate(timeout=5)
-
-    def test_keyboard_interrupt_cleanup_precedes_propagation(self):
-        from unittest.mock import Mock
-
-        process = Mock()
-        process.__enter__ = Mock(return_value=process)
-        process.__exit__ = Mock(return_value=False)
-        process.communicate.side_effect = KeyboardInterrupt()
-        with (
-            patch.object(toolchains.subprocess, "Popen", return_value=process),
-            patch.object(toolchains, "stop_process") as stop,
-        ):
-            with self.assertRaises(KeyboardInterrupt):
-                toolchains.run(["fixture"])
-        stop.assert_called_once_with(process)
-
-    def test_local_revision_formats_do_not_relax_upstream_pin_validation(self):
+class KnowledgeRevisionTests(unittest.TestCase):
+    def test_local_revision_formats_are_validated_per_hash_algorithm(self):
         from project.ai_workflow.tools.knowledge_state import valid_revision
 
         self.assertTrue(valid_revision("a" * 40, "sha1"))
@@ -408,5 +301,7 @@ class CommandCancellationTests(unittest.TestCase):
         self.assertFalse(valid_revision("b" * 64, "sha1"))
         self.assertFalse(valid_revision("a" * 40, "sha256"))
         self.assertFalse(valid_revision("g" * 64, "sha256"))
-        with self.assertRaises(toolchains.ToolchainError):
-            toolchains.validate_ref("b" * 64)
+
+
+if __name__ == "__main__":
+    unittest.main()

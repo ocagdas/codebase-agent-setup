@@ -11,20 +11,19 @@ python scripts/check.py
 
 The gate checks Ruff formatting, Ruff static analysis, distribution contracts and both unittest suites. It exits nonzero on failure and writes `.quality/gate.json` with `go: true` only if every stage passed. `.quality/tests.json` lists test counts, failures and explicit skips. `make check` is equivalent. Fix formatting with `python -m ruff format .`; do not bypass a failing check to obtain a green result.
 
-The default unit profile permits the existing optional integration skips and reports them. It is not the release gate. For all integration tests, install optional dependencies and prepare both pinned toolchains:
+The default unit profile permits and reports the optional packaging skip. For the strict profile:
 
 ```bash
-python -m pip install -e '.[dev,all]'
-python scripts/prepare_integration.py
+python -m pip install -e '.[dev]'
 ```
 
-The helper writes `.quality/toolchains/environment.json`. Set its four values in your shell: `SPECIFY_BIN`, `SPECIFY_ALTERNATE_BIN`, `SPECIFY_ALTERNATE_RECORD`, and `CBSETUP_PACKAGE_TESTS=1`. Then run:
+Set CBSETUP_PACKAGE_TESTS=1 to enable actual distribution installation tests, then run:
 
 ```bash
-python scripts/check.py --full
+CBSETUP_PACKAGE_TESTS=1 python scripts/check.py --full
 ```
 
-Full mode fails if prerequisites are absent or any test is skipped. It covers default and alternate Spec Kit installation, static/editable distributions and backend protocol fixtures. Run the strict profile on Linux; POSIX-only tests are explicitly skipped on Windows. Test results do not certify production Sourcegraph, real agent behavior or token savings.
+Full mode fails if packaging is disabled or any test is skipped. It covers static/editable distributions and payload installation without Spec Kit or backend adapters. Run the strict profile on Linux; POSIX-only tests are explicitly skipped on Windows. Test results do not certify real indexers, agents or token savings.
 
 ## Hosted checks and go/no-go integration
 
@@ -62,11 +61,11 @@ python scripts/build_release.py --verify-only
 
 The build command requires empty output, verifies tag/version consistency when a tag is supplied, builds one wheel and one source distribution, validates metadata with Twine, checks wheel licenses/payload, installs the wheel in a disposable environment, and writes checksummed `provenance.json` and `SHA256SUMS`. Build defaults to `.quality/release`; choose another directory with `--output`. A manifest detects changed bytes; it does not authenticate an arbitrary publisher.
 
-The **Release readiness** workflow runs on version tags or manual dispatch, reuses the entire CI gate and uploads a validated release candidate only after GO. It prepares distribution artifacts; it does not create public releases, upload to PyPI, change versions, move tags or deploy automatically. Publication can consume these artifacts behind the team's protected environment. Tag names must match both `pyproject.toml` and `upstream.lock.json`.
+The **Release readiness** workflow runs on version tags or manual dispatch, reuses the entire CI gate and uploads a validated release candidate only after GO. It prepares artifacts without publishing, changing versions or moving tags. Tag names must match pyproject.toml, the sole package-version source.
 
 ## Maintainer setup
 
-Enable GitHub private vulnerability reporting so the route in SECURITY.md works. Confirm a private maintainer contact for conduct reports, and configure notification/review ownership. Dependabot proposes weekly action and Python updates; each update must pass the same gate. Optional backend pins must stay consistent with `requirements-knowledge.txt`; default Spec Kit pins must stay consistent with `requirements.txt` and manifest compatibility constraints.
+Enable GitHub private vulnerability reporting so the route in SECURITY.md works. Confirm a private maintainer contact for conduct reports, and configure notification/review ownership. Dependabot proposes weekly action and Python updates; each update must pass the same gate. Only the dev dependency extra remains.
 
 See VALIDATION.md for what actually ran. A workflow committed locally is readiness evidence, not a successful remote CI run or verified Windows/macOS support.
 
@@ -98,12 +97,11 @@ delimiters). Duplicate keys and YAML merge keys are rejected; shell-script conte
 are not treated as workflow actions.
 
 Integration initializes `gate.json` and `tests.json` before Python dependency and
-Spec Kit setup. Until checks execute, these record NO-GO and tests not run. Setup
+package setup. Until checks execute, these record NO-GO and tests not run. Setup
 failures therefore retain uploadable diagnostics; successful gate/test execution
 replaces the placeholders. Artifact upload and the required Quality gate still fail
 on missing evidence or unsuccessful dependencies.
 
-The shared Dependabot policy excludes MCP 2.x and later while CodeGraphContext
-0.6.x requires MCP below 2. Keep the exact MCP pin synchronized between package
-extras and `requirements-knowledge.txt`; qualify a compatible backend before lifting
-that restriction. Dependency upgrades must resolve the complete `[dev,all]` extra.
+The MCP pin restriction was removed on 2026-09-30 with the CodeGraphContext and
+Sourcegraph adapters: there are no runtime dependencies left to constrain, and the
+only extra is `[dev]`. Dependency upgrades must resolve `[dev]`.
