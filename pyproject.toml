@@ -38,7 +38,7 @@ codebase-agent-setup = "codebase_agent_setup.cli:main"
 cbsetup = "codebase_agent_setup.cli:main"
 
 [project.optional-dependencies]
-dev = ["ruff==0.16.8", "build==1.6.0", "twine==7.0.0", "jsonschema==4.26.0", "PyYAML==6.0.3"]
+dev = ["ruff==0.16.8", "build==1.6.1", "twine==7.0.0", "jsonschema==4.26.0", "PyYAML==6.0.3"]
 
 [tool.setuptools]
 packages = ["codebase_agent_setup"]
