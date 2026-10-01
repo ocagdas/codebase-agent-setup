@@ -6,7 +6,7 @@ Use Git history for superseded evidence.
 ## Verified locally
 
 2026-10-01, dev/mvp_1.1.1 (renamed from dev/local-only-install), Linux/Python 3.12.12: strict
-`CBSETUP_PACKAGE_TESTS=1 .venv/bin/python scripts/check.py --full` passed **245 distribution/unit + 31 payload
+`CBSETUP_PACKAGE_TESTS=1 .venv/bin/python scripts/check.py --full` passed **248 distribution/unit + 31 payload
 tests, no failures or skips**, including static/editable builds and installs. Ruff, contracts and shared conformance
 passed; version and check-pr remain 1.1.0. New privacy regressions cover actual Git ignore behavior, preview-only
 writes, preserved rules, idempotent upgrades, explicit CLI sharing and fleet override, and unchanged tracking.
@@ -14,12 +14,21 @@ Editable template coverage includes real CLI export/edit/single/fleet preview/ap
 installation flows, source mutation detection, supported inventory/secret-shape validation, no script execution,
 author-owned guide preservation and explicit replacement with backup/rollback. Installed settings guide is 26 lines;
 administration lives in CAS user docs. Seven local installations were refreshed with filled guides unchanged,
-zero drift/missing files. Branch policy and whitespace checks passed. Latest full log: /tmp/cas-behaviour-full.log.
+zero drift/missing files. Branch policy and whitespace checks passed. Clean tracked-files-only full gate also
+passed without root AGENTS.md/AI_CONTEXT.md/ai_workflow/.cbsetup, with identical counts and no skips.
+Latest logs: /tmp/cas-clean-checkout-full.log and /tmp/cas-clean-ci-fix-full.log.
 Install, template creation and fleet now apply by default, with --dry-run previews. --behaviour defaults to upgrade;
 preserve adds missing files, override backs up and replaces supported files including the guide. Tests cover all
 modes, unknown unowned-file preservation, unrelated/local-settings preservation, rollback, invalid/conflicting CLI
 flags and built-in override. Actual static/editable launchers exercise default writes; capsule/config controls are unchanged.
-Source/tests/docs remain uncommitted/unpushed. This feature has no hosted CI evidence yet.
+Owner published feature commit 3f69f66 and PR #13. Hosted push 36874131822 and PR 36874228527 failed because
+distribution validation required the deliberately untracked root AGENTS.md. Clean testing additionally exposed
+the same requirement in shared conformance and setup-document bundle drift. Both validators now check the tracked
+project/AGENTS.md; the conformance adapter's optional agent_guide keeps existing root-guide behavior by default.
+Shared setup text is restored to its checksum-pinned baseline; changed conformance/schema/readme hashes are updated.
+Three regressions cover tracked-only validation, rejecting missing payload despite local guidance, and legacy
+adapter defaults. The first two reproduced the pre-fix failure. This CI correction is local/uncommitted/unpushed;
+fresh hosted qualification is still required. Installed root files remain ignored and untracked.
 
 Prior MVP revision 4e3d4ea passed hosted run 36847221902: Linux Python 3.11/3.12/3.13, macOS 14/Python 3.13,
 Windows/Python 3.13, analysis, distribution artifacts and strict Linux integration. MVP PR #12 is merged on main.

@@ -12,6 +12,12 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "agent_guide": {
+      "enum": [
+        "AGENTS.md",
+        "project/AGENTS.md"
+      ]
+    },
     "contract_version": {
       "const": "1.0.0"
     },

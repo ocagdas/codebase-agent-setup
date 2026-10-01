@@ -51,7 +51,6 @@ def validate(root=ROOT):
         "CI.md",
         "VERSIONING.md",
         "REPOSITORY_STRUCTURE.md",
-        "AGENTS.md",
         "HANDOFF.md",
         "SECURITY.md",
         "CODE_OF_CONDUCT.md",
@@ -60,6 +59,9 @@ def validate(root=ROOT):
         "docs/architecture.md",
     ):
         require((root / name).is_file(), f"Missing community documentation: {name}")
+    # Installed root guidance is private/ignored and absent from clean CI checkouts.
+    # Validate the tracked distributable payload instead; local copies cannot substitute for it.
+    require((root / "project/AGENTS.md").is_file(), "Missing agent payload documentation: project/AGENTS.md")
 
 
 def validate_document_links(root=ROOT):

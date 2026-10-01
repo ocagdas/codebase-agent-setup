@@ -54,8 +54,10 @@ def check(repo):
     if adapter["contract_version"] != contract["contract_version"]:
         raise ValueError("Adapter contract version differs")
     for name in contract["required_documents"]:
-        if not (repo / name).is_file():
-            raise ValueError(f"Missing document: {name}")
+        # Distributions validate their tracked payload, not an ignored local installation.
+        document = adapter.get("agent_guide", "AGENTS.md") if name == "AGENTS.md" else name
+        if not (repo / document).is_file():
+            raise ValueError(f"Missing document: {document}")
     for name in contract["canonical_workflows"]:
         if not (repo / ".github/workflows" / name).is_file():
             raise ValueError(f"Missing workflow: {name}")

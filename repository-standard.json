@@ -10,5 +10,6 @@
   "version_mirror": "pyproject.toml",
   "trunk_variable": "REPOSITORY_TRUNK",
   "publication": "disabled",
-  "license_profile": "MIT"
+  "license_profile": "MIT",
+  "agent_guide": "project/AGENTS.md"
 }

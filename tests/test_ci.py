@@ -5,6 +5,8 @@ import io
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -13,7 +15,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts import check, run_tests, validate_project
+from scripts import check, check_repository_standard, run_tests, validate_project
 
 
 class QualityGateTests(unittest.TestCase):
@@ -85,6 +87,46 @@ class QualityGateTests(unittest.TestCase):
 
     def test_distribution_contracts_and_license_metadata(self):
         validate_project.validate()
+
+    def tracked_snapshot(self, directory):
+        """Copy tracked working files only: ignored local installations must not mask CI failures."""
+        root = Path(directory)
+        tracked = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode("utf-8").split("\0")
+        for name in filter(None, tracked):
+            source = ROOT / name
+            destination = root / name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+        return root
+
+    def test_distribution_validation_works_without_local_cas_installation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.tracked_snapshot(temporary)
+            for name in ("AGENTS.md", "AI_CONTEXT.md", "ai_workflow", ".cbsetup"):
+                self.assertFalse((root / name).exists(), name)
+            validate_project.validate(root)
+            validate_project.validate_document_links(root)
+            check_repository_standard.check(root)
+
+    def test_local_agent_pointer_cannot_mask_missing_product_payload(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.tracked_snapshot(temporary)
+            (root / "AGENTS.md").write_text("Local installed pointer\n", encoding="utf-8")
+            (root / "project/AGENTS.md").unlink()
+            with self.assertRaisesRegex(ValueError, "Missing agent payload documentation: project/AGENTS.md"):
+                validate_project.validate(root)
+            with self.assertRaisesRegex(ValueError, "Missing document: project/AGENTS.md"):
+                check_repository_standard.check(root)
+
+    def test_standard_agent_guide_defaults_to_root_for_existing_adapters(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.tracked_snapshot(temporary)
+            path = root / "repository-standard.json"
+            adapter = json.loads(path.read_text(encoding="utf-8"))
+            adapter.pop("agent_guide")
+            path.write_text(json.dumps(adapter), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Missing document: AGENTS.md"):
+                check_repository_standard.check(root)
 
     def test_required_gate_and_release_dependency_are_present(self):
         import yaml
