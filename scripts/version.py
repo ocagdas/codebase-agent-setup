@@ -17,7 +17,7 @@ else:
     import repository_release as shared
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION_FILES = ("pyproject.toml", "upstream.lock.json")
+VERSION_FILES = ("pyproject.toml",)
 PATTERN = re.compile(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)")
 
 
@@ -35,11 +35,7 @@ def project_version(text: str) -> str:
 
 
 def current() -> str:
-    version = project_version((ROOT / VERSION_FILES[0]).read_text(encoding="utf-8"))
-    mirror = json.loads((ROOT / VERSION_FILES[1]).read_text(encoding="utf-8"))["package_version"]
-    if mirror != version:
-        raise ValueError("pyproject.toml and upstream.lock.json package_version must agree")
-    return version
+    return project_version((ROOT / VERSION_FILES[0]).read_text(encoding="utf-8"))
 
 
 change_kind = shared.change_kind
@@ -49,27 +45,20 @@ bump = shared.bump
 def write_version(version: str, *, dry_run: bool = False) -> dict:
     old = current()
     change_kind(old, version)
-    paths = [ROOT / name for name in VERSION_FILES]
-    originals = [p.read_text(encoding="utf-8") for p in paths]
+    path = ROOT / VERSION_FILES[0]
+    original = path.read_text(encoding="utf-8")
     # Limit replacement to the project table, not unrelated tool versions.
     project = re.sub(
         r'(\[project\]\n[\s\S]*?^version = )"[^"]+"',
         rf'\g<1>"{version}"',
-        originals[0],
+        original,
         count=1,
         flags=re.M,
     )
-    package, count = re.subn(r'"package_version": "[^"\n]+"', f'"package_version": "{version}"', originals[1])
-    if project_version(project) != version or count != 1:
+    if project_version(project) != version:
         raise ValueError("Version files do not have the supported assignment format")
     if not dry_run:
-        try:
-            for path, content in zip(paths, (project, package)):
-                path.write_text(content, encoding="utf-8")
-        except OSError:
-            for path, content in zip(paths, originals):
-                path.write_text(content, encoding="utf-8")
-            raise
+        path.write_text(project, encoding="utf-8")
     return {"previous": old, "version": version, "tag": f"v{version}", "dry_run": dry_run}
 
 

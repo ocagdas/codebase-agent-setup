@@ -38,10 +38,6 @@ class PublishVersionTests(unittest.TestCase):
         for name in ("version.py", "publish_version.py", "repository_release.py"):
             shutil.copyfile(ROOT / "scripts" / name, self.repo / "scripts" / name)
         (self.repo / "pyproject.toml").write_text('[project]\nname = "fixture"\nversion = "1.1.0"\n', encoding="utf-8")
-        shutil.copyfile(ROOT / "upstream.lock.json", self.repo / "upstream.lock.json")
-        pin = json.loads((self.repo / "upstream.lock.json").read_text(encoding="utf-8"))
-        pin["package_version"] = "1.1.0"
-        (self.repo / "upstream.lock.json").write_text(json.dumps(pin, indent=2) + "\n", encoding="utf-8")
         self.git("init", "-b", "main")
         self.git("add", ".")
         self.git("commit", "-m", "initial")
@@ -85,12 +81,10 @@ class PublishVersionTests(unittest.TestCase):
         )
 
     def test_patch_atomic_publication_and_rerun(self):
-        old = json.loads((self.repo / "upstream.lock.json").read_text(encoding="utf-8"))
         self.assertIn('"status": "published"', self.publish())
         self.assertEqual(self.git("rev-parse", "v1.1.1^{}"), self.git("rev-parse", "HEAD"))
         self.assertEqual(self.git("cat-file", "-t", "v1.1.1"), "tag")
-        new = json.loads((self.repo / "upstream.lock.json").read_text(encoding="utf-8"))
-        self.assertEqual(new, old | {"package_version": "1.1.1"})
+        self.assertIn('version = "1.1.1"', (self.repo / "pyproject.toml").read_text(encoding="utf-8"))
         self.assertEqual(self.git("rev-parse", "HEAD^"), self.source)
         self.assertIn(self.git("rev-parse", "HEAD"), self.git("ls-remote", "origin", "refs/heads/main"))
         self.git("checkout", "--detach", self.source)
@@ -138,11 +132,10 @@ class PublishVersionTests(unittest.TestCase):
         self.assertEqual(self.git("rev-parse", "v1.2.0^{}"), self.source)
         self.script("tag")  # idempotent
 
-    def test_wrong_source_and_unsynchronized_metadata_fail(self):
+    def test_publishing_a_commit_other_than_the_checked_source_fails(self):
+        # The metadata-synchronisation half of this test retired with the second version file.
         self.env["GITHUB_SHA"] = self.base
         self.publish(good=False)
-        (self.repo / "pyproject.toml").write_text('[project]\nversion = "1.2.0"\n', encoding="utf-8")
-        self.script("check", good=False)
 
     def test_pr_comparison_uses_merge_base_not_newer_main_version(self):
         self.git("checkout", "-b", "feature", self.source)

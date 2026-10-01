@@ -1,1 +1,1 @@
-Read `AI_CONTEXT.md` completely and follow its loading instructions. Spec Kit owns specifications, plans and task state. This file only provides discovery.
+Read `AI_CONTEXT.md` completely and follow its loading order. It is the single guide for every coding assistant in this repository; repository-specific rules are in `ai_workflow/project_guide.md`. This file only provides discovery.

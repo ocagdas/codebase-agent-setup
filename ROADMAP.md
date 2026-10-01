@@ -2,7 +2,7 @@
 
 Status: reconciled with the working tree on 8 September 2026. Configuration, version overrides and packaging are implemented; local retrieval and manual full-snapshot sharing are partial deliveries of the knowledge roadmap. STATUS.md and VALIDATION.md remain the sources for current readiness and executed checks.
 
-See [knowledge design](docs/development/knowledge-design.md) for artifact, configuration and branch-composition constraints; TODO.md owns open actions.
+See [repository knowledge](project/ai_workflow/knowledge.md) for the layer model and the agent-facing rules; TODO.md owns open actions.
 
 ## Aim
 
@@ -14,7 +14,7 @@ Keep the knowledge engine usable independently of Spec Kit, with this package pr
 
 The package supplies project configuration, engineering guidance, agent entry points, an upstream Spec Kit pin, and installation helpers. Bootstrap creates local file inventories, branch deltas, and worktree overlays. It checks basic semantic manifests but does not execute an indexing backend, compose semantic graphs, or publish/fetch shared artifacts.
 
-The separate knowledge adapter provides default-off CGC retrieval and Sourcegraph revision-scoped keyword searches. CGC explicitly rebuilds a clean revision and exports/imports checked full snapshots. Bootstrap reports the selected backend without invoking it. Static/editable packaging and optional dependency profiles are also delivered; see docs/user/installation-modes.md.
+Repository knowledge is indexer-agnostic as of 2026-09-30: the CGC and Sourcegraph adapters were retired and CAS ships no indexer. You declare a command; CAS runs it, caches each artifact under the content hash of the single file it describes, resolves worktree over branch over base, and shares artifacts through declared transport commands. Mixed-language repositories are supported — C/C++ and Python indexers coexist in one cache.
 
 Current base selection picks the first configured reference that exists, then uses its merge-base with HEAD. It does not infer parent trunks. Large-repository performance and live agent token savings have not been established.
 
@@ -115,7 +115,7 @@ Exit: verify merge rules and two-clone personal project reuse with isolated chec
 
 ### Phase 2 — Reproducible Spec Kit overrides
 
-Initial implementation delivered; see [docs/user/toolchain-versions.md](docs/user/toolchain-versions.md) for scope and validation limits.
+Retired 2026-09-30: Spec Kit toolchain selection left the core along with Spec Kit itself.
 
 Deliver version resolution, isolated environments, local toolchain records, staging compatibility checks, and upgrade previews while leaving the distribution pin unchanged.
 
@@ -123,7 +123,7 @@ Exit: exercise the default and at least one selected alternative using actual CL
 
 ### Phase 3 — Useful local indexing and retrieval
 
-Status: Partial: clean-revision CGC retrieval and Sourcegraph keyword queries are implemented. Semantic incremental updates, compiler/build-context accuracy and a measured agent comparison remain open.
+Status: Partial. Phase 1 of the indexer-agnostic design is implemented and proven on mixed C and Python: declared indexers, per-file content addressing, three layers, declared transports, and a guard refusing any layer whose commit is not checked out. Open: `query` consults only the first configured indexer (a silent wrong answer, not merely a gap), a real indexer choice, and the measured agent comparison. No token-saving claim may ship before that measurement.
 
 Select one backend using the pilot's language/build needs. Deliver bounded fact queries, source fallback, branch/worktree updates, and evidence-linked summaries where useful.
 
@@ -131,7 +131,7 @@ Exit: validate results against source/build evidence, including deletions, renam
 
 ### Phase 4 — Multiple trunks and portable reuse
 
-Status: Partial manual sharing only: full CGC snapshots have been transferred between two local clones at the same revision. Trunk selection, composed semantic overlays, shared immutable cache and two-machine validation remain open.
+Status: Partial. Content addressing gives clone-independent reuse by construction — the same file content resolves to the same artifact in any clone, on any branch, under any path — and `push`/`pull` move artifacts through declared commands. Open: trunk inference, a configured shared store (Azure, deliberately left open), retention and `gc`, and two-machine validation.
 
 Deliver trunk inference with overrides, ancestor snapshot selection, exact-base overlays, shared local cache, and bundle export/import.
 
@@ -163,6 +163,11 @@ Exit: publish repeatable large-repository results for time, storage, network tra
 
 Phases 1–2 establish reproducible settings/tooling. Phases 3–4 prove knowledge quality and reuse before central publication in phase 5. Update STATUS.md and VALIDATION.md as implementation and evidence arrive; this document does not change readiness claims.
 
-## Backend pilot update
+## Knowledge pilot update
 
-CGC and Sourcegraph adapters are implemented behind a default-off selector. CGC supports full clean-revision snapshots and portable bundle transfer; Sourcegraph provides centralized revision-scoped retrieval. Trunk-plus-branch semantic composition, automated CI publishing/fetching and measured token reduction remain future milestones.
+The CGC and Sourcegraph adapters were retired on 2026-09-30 and replaced by a wrapper model: CAS ships no indexer and
+runs whichever one a repository declares. What is proven is the caching and sharing substrate, not a value claim — the
+only number so far is a size ratio (skeletons are 19 % of source bytes), which is neither tokens nor task success. The
+open pilot questions are which indexer to adopt first (ctags to prove the plumbing, tree-sitter as the first useful
+one, scip-clang for C/C++ cross-translation-unit resolution) and then running the measurement that would justify any
+of it.

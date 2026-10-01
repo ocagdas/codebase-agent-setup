@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0",
+  "state_directory": ".ai_cache/code_knowledge",
+  "layer_storage": {
+    "base_directory": "bases",
+    "matching_branch_directory": "matching_branches",
+    "other_branch_directory": "local_branches",
+    "branch_overlay_directory": "overlays/branch",
+    "worktree_overlay_directory": "overlays/worktree",
+    "query_precedence": [
+      "worktree_overlay",
+      "branch_overlay",
+      "base"
+    ]
+  },
+  "branch_selection": {
+    "include_regex": [
+      "^develop/.+$"
+    ],
+    "exclude_regex": [],
+    "non_matching_branch_policy": "local_ephemeral_only",
+    "base_ref_candidates": [
+      "origin/develop",
+      "develop",
+      "origin/main",
+      "main",
+      "origin/master",
+      "master"
+    ]
+  },
+  "source_selection": {
+    "include_globs": [
+      "**/*.c",
+      "**/*.cc",
+      "**/*.cpp",
+      "**/*.cxx",
+      "**/*.h",
+      "**/*.hh",
+      "**/*.hpp",
+      "**/*.hxx",
+      "**/CMakeLists.txt",
+      "**/*.cmake",
+      "**/Kconfig*",
+      "**/*.md",
+      "**/*.yaml",
+      "**/*.yml",
+      "**/*.json",
+      "**/*.py",
+      "**/*.pyi",
+      "**/*.ipynb",
+      "**/*.toml",
+      "**/*.lock",
+      "**/*.sh",
+      "**/*.s",
+      "**/*.S",
+      "**/*.ld",
+      "**/*.lds",
+      "**/*.dts",
+      "**/*.dtsi",
+      "**/*.proto",
+      "**/*.txt"
+    ],
+    "include_root_files": [
+      "CMakeLists.txt",
+      "Kconfig",
+      "Makefile"
+    ],
+    "exclude_globs": [
+      ".git/**",
+      ".ai_cache/**",
+      "build/**",
+      "**/build/**",
+      "third_party/**",
+      "**/third_party/**",
+      "vendor/**",
+      "**/vendor/**",
+      ".venv/**",
+      "**/.venv/**",
+      "**/__pycache__/**",
+      "data/**",
+      "datasets/**",
+      "artifacts/**"
+    ]
+  },
+  "global_invalidation_globs": [
+    "CMakeLists.txt",
+    "**/CMakeLists.txt",
+    "**/*.cmake",
+    "Kconfig",
+    "**/Kconfig*",
+    "**/*toolchain*",
+    "**/compile_commands.json",
+    "**/pyproject.toml",
+    "**/requirements*.txt",
+    "**/*.lock",
+    "**/*.ld",
+    "**/*.lds",
+    "**/*.dts",
+    "**/*.dtsi",
+    "compile_commands.json"
+  ],
+  "header_globs": [
+    "**/*.h",
+    "**/*.hh",
+    "**/*.hpp",
+    "**/*.hxx"
+  ],
+  "semantic_index": {
+    "mode": "auto",
+    "backend": "clang",
+    "create_when_missing": false,
+    "compile_database_candidates": [
+      "compile_commands.json",
+      "build/compile_commands.json"
+    ],
+    "manifest_file": "semantic_index/manifest.json",
+    "query_command": null,
+    "base_update_command": null,
+    "branch_overlay_update_command": null,
+    "worktree_overlay_update_command": null,
+    "fallback_when_unavailable": "direct_source_analysis",
+    "base_remote_namespace": "code_knowledge/base/{base_ref}/{commit}",
+    "matching_branch_remote_namespace": "code_knowledge/branches/{branch}/{commit}",
+    "publish_matching_branch_overlays": false,
+    "publish_worktree_overlays": false,
+    "base_updates_require_trusted_external_workflow": true
+  },
+  "analysis": {
+    "repository_analysis_file": "repository_analysis.md",
+    "file_index_file": "file_index.json",
+    "pending_request_file": "analysis_request.json",
+    "branch_delta_file": "branch_delta.md",
+    "branch_delta_data_file": "branch_delta.json",
+    "delta_directory": "deltas"
+  }
+}

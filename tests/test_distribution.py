@@ -14,49 +14,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class DistributionTests(unittest.TestCase):
-    def test_setup_profiles_preview_and_aliases(self):
-        for mode in ("native", "venv", "conda"):
-            for install_mode in ("static", "editable"):
-                output = subprocess.check_output(
-                    [
-                        sys.executable,
-                        str(ROOT / "setup_tooling.py"),
-                        "--mode",
-                        mode,
-                        "--" + install_mode,
-                        "--extras",
-                        "sourcegraph",
-                    ],
-                    text=True,
-                    encoding="utf-8",
-                )
-                plan = json.loads(output)
-                command = plan["commands"][-1]
-                self.assertEqual("--editable" in command, install_mode == "editable")
-                self.assertTrue(command[-1].endswith("[sourcegraph]"))
-                self.assertEqual(plan["extras"], "sourcegraph")
-                self.assertFalse(plan["apply"])
-        default = json.loads(
-            subprocess.check_output([sys.executable, str(ROOT / "setup_tooling.py")], text=True, encoding="utf-8")
-        )
-        self.assertEqual((default["extras"], default["install_mode"]), ("minimal", "static"))
-
     def test_dependency_profiles_and_version_match_distribution(self):
         data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-        self.assertEqual(
-            data["version"], json.loads((ROOT / "upstream.lock.json").read_text(encoding="utf-8"))["package_version"]
-        )
+        # Core runs on the standard library alone; every backend is an extra.
         self.assertEqual(data["dependencies"], [])
-        requirements = [
-            line
-            for line in (ROOT / "requirements-knowledge.txt").read_text(encoding="utf-8").splitlines()
-            if line and not line.startswith("#")
-        ]
-        mcp = [requirement for requirement in requirements if requirement.startswith("mcp==")]
-        self.assertEqual(len(mcp), 1, "Keep exactly one shared MCP pin")
-        self.assertEqual(data["optional-dependencies"]["sourcegraph"], mcp)
-        self.assertEqual(set(data["optional-dependencies"]["cgc"]), set(requirements))
-        self.assertEqual(set(data["optional-dependencies"]["all"]), set(requirements))
+        # C6 retired 2026-09-30: the only extra left is the maintainer toolchain, and it must stay optional.
+        self.assertEqual(set(data["optional-dependencies"]), {"dev"})
 
     @unittest.skipUnless(
         os.environ.get("CBSETUP_PACKAGE_TESTS"),
@@ -74,15 +37,11 @@ class DistributionTests(unittest.TestCase):
                     "README.md",
                     "LICENSE",
                     "NOTICE.md",
-                    "upstream.lock.json",
-                    "legacy_v6_files.json",
-                    "requirements.txt",
-                    "requirements-knowledge.txt",
                     "environment.yml",
                 )
             ]:
                 shutil.copy2(file, source / file.name)
-            for name in ("src", "project", "preset", "extension"):
+            for name in ("src", "project"):
                 shutil.copytree(ROOT / name, source / name, ignore=shutil.ignore_patterns("__pycache__"))
             stale = source / "build/lib/codebase_agent_setup/stale_module.py"
             stale.parent.mkdir(parents=True)
@@ -109,16 +68,11 @@ class DistributionTests(unittest.TestCase):
                 resources[mode] = Path(info["resource_path"])
                 self.assertTrue((locations[mode] / "install_transaction.py").is_file())
                 for name in (
-                    "project/.specify/memory/constitution.md",
                     "project/.github/copilot-instructions.md",
                     "project/.cursor/rules/engineering.mdc",
-                    "project/ai_workflow/tools/knowledge_backend.py",
                     "project/ai_workflow/tools/bootstrap_validation.py",
                     "project/ai_workflow/tools/knowledge_state.py",
                     "project/ai_workflow/bootstrap.schema.json",
-                    "preset/preset.yml",
-                    "extension/extension.yml",
-                    "legacy_v6_files.json",
                 ):
                     self.assertTrue((resources[mode] / name).is_file(), name)
                 self.assertEqual(
@@ -129,8 +83,8 @@ class DistributionTests(unittest.TestCase):
                             text=True,
                             encoding="utf-8",
                         )
-                    )["settings"]["knowledge"]["backend"],
-                    "off",
+                    )["settings"]["knowledge"]["indexers"],
+                    [],
                 )
                 consumer = base / (mode + "-bootstrap")
                 consumer.mkdir()
@@ -179,7 +133,7 @@ class DistributionTests(unittest.TestCase):
                 [
                     sys.executable,
                     "-c",
-                    "from codebase_agent_setup import toolchains; print(toolchains.ROOT); toolchains.lock()",
+                    "from codebase_agent_setup import resources; print(resources.RESOURCE_ROOT)",
                 ],
                 cwd=base,
                 env=os.environ | {"PYTHONPATH": str(vendored.parent)},
@@ -208,63 +162,36 @@ class DistributionTests(unittest.TestCase):
                     mode == "editable",
                 )
             source.rename(base / "moved source")
-            if os.environ.get("SPECIFY_ALTERNATE_BIN") and os.environ.get("SPECIFY_ALTERNATE_RECORD"):
-                env = dict(
-                    os.environ,
-                    PATH=str(Path(os.environ["SPECIFY_ALTERNATE_BIN"]).parent) + os.pathsep + os.environ["PATH"],
-                )
-                selected = subprocess.run(
-                    [
-                        str(launchers["static"]),
-                        "install",
-                        str(base / "alternate-consumer"),
-                        "--toolchain-record",
-                        os.environ["SPECIFY_ALTERNATE_RECORD"],
-                    ],
-                    env=env,
-                    cwd=base,
-                    capture_output=True,
-                    text=True,
-                    encoding="utf-8",
-                )
-                self.assertEqual(selected.returncode, 0, selected.stdout + selected.stderr)
-                self.assertEqual(json.loads(selected.stdout)["compatibility"]["source_verification"], "verified_commit")
             subprocess.run([str(launchers["static"]), "--version"], cwd=base, check=True, capture_output=True)
-            if os.environ.get("SPECIFY_BIN"):
-                target = base / "consumer"
-                target.mkdir()
-                authored = target / "AI_CONTEXT.md"
-                installed = subprocess.run(
-                    [
-                        str(launchers["static"]),
-                        "install",
-                        str(target),
-                        "--specify",
-                        os.environ["SPECIFY_BIN"],
-                        "--apply",
-                    ],
-                    cwd=base,
-                    capture_output=True,
-                    text=True,
-                    encoding="utf-8",
-                )
-                self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
-                authored.write_text("User instructions\n", encoding="utf-8")
-                upgraded = subprocess.run(
-                    [
-                        str(launchers["static"]),
-                        "install",
-                        str(target),
-                        "--specify",
-                        os.environ["SPECIFY_BIN"],
-                        "--upgrade",
-                        "--apply",
-                    ],
-                    cwd=base,
-                    capture_output=True,
-                    text=True,
-                    encoding="utf-8",
-                )
-                self.assertEqual(upgraded.returncode, 0, upgraded.stdout + upgraded.stderr)
-                self.assertEqual(authored.read_text(encoding="utf-8"), "User instructions\n")
-                self.assertTrue((target / "ai_workflow/tools/knowledge_backend.py").is_file())
+            target = base / "consumer"
+            target.mkdir()
+            authored = target / "AI_CONTEXT.md"
+            installed = subprocess.run(
+                [
+                    str(launchers["static"]),
+                    "install",
+                    str(target),
+                    "--apply",
+                ],
+                cwd=base,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
+            authored.write_text("User instructions\n", encoding="utf-8")
+            upgraded = subprocess.run(
+                [
+                    str(launchers["static"]),
+                    "install",
+                    str(target),
+                    "--upgrade",
+                    "--apply",
+                ],
+                cwd=base,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(upgraded.returncode, 0, upgraded.stdout + upgraded.stderr)
+            self.assertEqual(authored.read_text(encoding="utf-8"), "User instructions\n")

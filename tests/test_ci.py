@@ -61,7 +61,7 @@ class QualityGateTests(unittest.TestCase):
             self.assertEqual(run_tests.main(["--full", "--report", str(report)]), 1)
             result = json.loads(report.read_text(encoding="utf-8"))
             self.assertFalse(result["passed"])
-            self.assertIn("SPECIFY_BIN", result["error"])
+            self.assertIn("CBSETUP_PACKAGE_TESTS", result["error"])
 
     def test_full_test_profile_rejects_skips_unit_profile_discloses_them(self):
         class Skipped(unittest.TestCase):
@@ -72,8 +72,7 @@ class QualityGateTests(unittest.TestCase):
         def suite(*args, **kwargs):
             return unittest.TestSuite([Skipped("test_fixture")])
 
-        environment = {key: "fixture" for key in ("SPECIFY_BIN", "SPECIFY_ALTERNATE_BIN", "SPECIFY_ALTERNATE_RECORD")}
-        environment["CBSETUP_PACKAGE_TESTS"] = "1"
+        environment = {"CBSETUP_PACKAGE_TESTS": "1"}
         with (
             patch.dict(os.environ, environment),
             patch.object(unittest.TestLoader, "discover", side_effect=suite),

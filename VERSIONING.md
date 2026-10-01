@@ -1,6 +1,6 @@
 # Package versions and tags
 
-codebase-agent-setup follows the common [repository contract](REPOSITORY_STRUCTURE.md), with `pyproject.toml [project].version` mirrored in `upstream.lock.json package_version`. Package bumps leave the official Spec Kit pin, requirements.txt, preset and extension versions unchanged. Consumer toolchain overrides are independent.
+codebase-agent-setup follows the common [repository contract](REPOSITORY_STRUCTURE.md). `pyproject.toml [project].version` is the sole package-version source; upstream.lock.json and Spec Kit provisioning were retired. The repository adapter points its version mirror field at pyproject.toml. Ordinary feature PRs preserve the trunk version; CI owns the subsequent qualifying patch bump and immutable tag.
 
 ## Commands and outputs
 
@@ -21,7 +21,7 @@ Numeric MAJOR.MINOR.PATCH is required; leading zeros, prereleases, inconsistent 
 
 `--github-output` explicitly writes step outputs. `classify-release` requires tag, HEAD and package version to agree and always returns `publish: false`. Public GitHub Release/PyPI publication remains disabled.
 
-Local bump commands edit the two mirrors but do not commit/push. Use a clean, current selected-trunk checkout for a maintainer version increase; review, commit and push through authorized maintainer procedures. `tag` requires a clean tree, creates an annotated tag, and never moves an existing tag. The same-commit tag is an idempotent no-op. Local tagging does not run CI.
+Local bump commands edit pyproject.toml but do not commit/push. Use a clean, current selected-trunk checkout for a maintainer version increase; review, commit and push through authorized maintainer procedures. `tag` requires a clean tree, creates an annotated tag, and never moves an existing tag. The same-commit tag is an idempotent no-op. Local tagging does not run CI.
 
 ## Trunk and automatic policy
 

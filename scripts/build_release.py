@@ -83,8 +83,7 @@ def main(argv=None):
     ):
         raise ValueError("Release builds require a clean checkout of the exact annotated tag")
     version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-    pin = json.loads((ROOT / "upstream.lock.json").read_text(encoding="utf-8"))
-    if pin["package_version"] != version or (args.tag and args.tag != "v" + version):
+    if args.tag and args.tag != "v" + version:
         raise ValueError("Tag and package version files must agree")
     if output.exists() and any(output.iterdir()):
         raise ValueError("Artifact output must be empty; choose a new directory or remove old artifacts explicitly")
@@ -110,8 +109,8 @@ def main(argv=None):
         required = {
             "docs/index.md",
             "docs/architecture.md",
-            "docs/user/installation-modes.md",
-            "docs/development/knowledge-design.md",
+            "docs/user/switching-agent-tools.md",
+            "docs/development/publishing-repository.md",
             "REPOSITORY_STRUCTURE.md",
             "TODO.md",
             "scripts/version.py",

@@ -13,7 +13,7 @@ private strategy notes, production media and installed consumer payloads are exc
 | Conduct and support | CODE_OF_CONDUCT.md byte-identical; SUPPORT.md same structure and common reporting text | Getting-started links differ; ACF explicitly limits support to authorized collaborators. |
 | Workflows | workflows/{ci.yml,version.yml,release.yml,verify-release.yml} in all three | Job implementations, App settings and release policy remain adapters. All have published artifact qualification; platforms and publication policy differ. |
 | Agent integration | Preserved | aiplane .github/copilot-instructions.md serves its agent integration. codebase-agent-setup's consumer integration files belong in project/, not the tooling root. |
-| Release notes and installation guides | Preserved where consumed | aiplane CHANGELOG.md is release-note input; its user/README.md has product contract coverage. codebase-agent-setup QUICKSTART.md and INSTALLATION.md have installed/setup references. |
+| Release notes and installation guides | Preserved where consumed | aiplane CHANGELOG.md is release-note input; its user/README.md has product contract coverage. codebase-agent-setup folded QUICKSTART.md and INSTALLATION.md into README.md (2026-09-30). |
 
 The former aiplane Markdown issue templates were removed after replacing them with
 shared YAML forms. Its contributor guide moved from docs/development/README.md to

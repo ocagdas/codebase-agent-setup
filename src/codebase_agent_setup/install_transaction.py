@@ -14,7 +14,9 @@ import uuid
 import sys
 from contextlib import contextmanager
 
-JOURNAL = ".specify/engineering-transaction"
+STATE = ".cbsetup"
+JOURNAL = STATE + "/transaction"
+RETIRED = "retired-"
 
 
 def digest(path):
@@ -33,6 +35,25 @@ def atomic_copy(source, target):
             os.fsync(handle.fileno())
         shutil.copystat(source, temporary)
         temporary.replace(target)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def write_json(path, data):
+    """Atomically replace path with pretty-printed JSON; never follow a symlink."""
+    path = Path(path)
+    if path.is_symlink():
+        raise RuntimeError(f"Refusing to replace a symlink: {path}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(json.dumps(data, indent=2, sort_keys=True) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(path)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
@@ -70,7 +91,7 @@ def lock_functions(handle, *, windows):
 @contextmanager
 def installation_lock(target):
     """Persistent lock inode; the OS releases ownership on process exit."""
-    path = checked_path(target, ".specify/engineering-install.lock")
+    path = checked_path(target, STATE + "/install.lock")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a+b") as handle:
         handle.seek(0, 2)
@@ -100,7 +121,7 @@ def write_manifest(journal, entries, phase):
 
 
 def cleanup_retired(target):
-    for path in (target / ".specify").glob("engineering-retired-*"):
+    for path in (target / STATE).glob(RETIRED + "*"):
         if path.is_symlink() or not path.is_dir():
             continue
         try:
@@ -111,7 +132,7 @@ def cleanup_retired(target):
 
 def retire(target, journal):
     # Once renamed, partial deletion can never look like an active transaction.
-    journal.rename(journal.with_name("engineering-retired-" + uuid.uuid4().hex))
+    journal.rename(journal.with_name(RETIRED + uuid.uuid4().hex))
     cleanup_retired(target)
 
 
@@ -134,10 +155,6 @@ def recover_locked(target):
         return
     if journal.is_symlink() or any(p.is_symlink() for p in journal.parents):
         raise RuntimeError("Refusing symlink installation journal")
-    if (journal / "owner").exists():
-        raise RuntimeError(
-            f"Legacy installation journal at {journal}; stop any old installer and reconcile it manually before removal."
-        )
     manifest = checked_path(journal, "manifest.json")
     if not manifest.exists():
         retire(target, journal)  # Snapshot preparation never writes destinations.

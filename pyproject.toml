@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "codebase-agent-setup"
 version = "1.1.0"
-description = "Project guidance and optional code knowledge for GitHub Spec Kit"
+description = "Tool-neutral agent setup for a fleet of repositories: guides, handover continuity and portable capsules"
 requires-python = ">=3.11"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE.md"]
-keywords = ["spec-kit", "developer-tools", "llm", "code-index", "project-guidance"]
+keywords = ["ai-agents", "developer-tools", "llm", "agents-md", "configuration-management"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
@@ -22,14 +22,14 @@ classifiers = [
   "Topic :: Software Development :: Build Tools",
 ]
 
-# setup_tooling.py installs the selected immutable Spec Kit source separately.
+# Standard library only: no runtime dependencies, so uvx/pipx installs are instant.
 dependencies = []
 
 [project.urls]
 Homepage = "https://github.com/ocagdas/codebase-agent-setup"
 Repository = "https://github.com/ocagdas/codebase-agent-setup"
 Issues = "https://github.com/ocagdas/codebase-agent-setup/issues"
-Documentation = "https://github.com/ocagdas/codebase-agent-setup/blob/main/QUICKSTART.md"
+Documentation = "https://github.com/ocagdas/codebase-agent-setup#quickstart"
 
 
 
@@ -39,9 +39,6 @@ cbsetup = "codebase_agent_setup.cli:main"
 
 [project.optional-dependencies]
 dev = ["ruff==0.16.8", "build==1.6.1", "twine==7.0.0", "jsonschema==4.26.0", "PyYAML==6.0.3"]
-cgc = ["codegraphcontext==0.6.13", "kuzu==0.11.3", "mcp==1.30.0"]
-sourcegraph = ["mcp==1.30.0"]
-all = ["codegraphcontext==0.6.13", "kuzu==0.11.3", "mcp==1.30.0"]
 
 [tool.setuptools]
 packages = ["codebase_agent_setup"]
@@ -53,12 +50,11 @@ build_py = "build_support.BuildPy"
 
 [tool.setuptools.package-data]
 codebase_agent_setup = [
-  "upstream.lock.json", "legacy_v6_files.json", "requirements*.txt", "environment.yml",
-  "preset/**/*.md", "preset/*.yml", "extension/**/*.md", "extension/*.yml",
+  "environment.yml",
   "project/ai_workflow/LICENSE", "project/*.md", "project/ai_workflow/*.md", "project/ai_workflow/*.json",
   "project/ai_workflow/*.yaml", "project/ai_workflow/knowledge/*.json",
   "project/ai_workflow/tools/*.py", "project/.github/*.md",
-  "project/.specify/memory/*.md", "project/.cursor/rules/*.mdc"
+  "project/.cursor/rules/*.mdc"
 ]
 
 [tool.setuptools.exclude-package-data]
@@ -75,11 +71,6 @@ select = ["E4", "E7", "E9", "F"]
 [tool.ruff.lint.per-file-ignores]
 # Tests deliberately import modules from the standalone consumer payload.
 "tests/*.py" = ["E402"]
-"install.py" = ["E402"]
-"configure.py" = ["E402"]
-"knowledge.py" = ["E402"]
-"setup_tooling.py" = ["E402"]
-"docker_install.py" = ["E402"]
 
 [tool.ruff.format]
 quote-style = "double"

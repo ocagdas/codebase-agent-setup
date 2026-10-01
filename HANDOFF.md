@@ -9,7 +9,8 @@ identifies policy owners; update them rather than copying policy into this hando
 instruct work on this tooling distribution. Runtime code lives in `src/codebase_agent_setup/`;
 [architecture](docs/architecture.md) explains source, editable and wheel resources.
 Preserve consumer-authored files and test installation/upgrade recovery when changing
-those paths. Keep upstream.lock.json and requirements.txt consistent.
+those paths. Root AI_CONTEXT.md and ai_workflow/project_guide.md govern this checkout.
+pyproject.toml is the sole package-version source; Spec Kit and its pin files are retired.
 
 Use the current Python interpreter and UTF-8 I/O. Follow [CI.md](CI.md) for required
 checks and record actual scope in VALIDATION.md; do not infer unexecuted platform or

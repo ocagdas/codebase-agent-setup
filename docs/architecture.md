@@ -1,22 +1,22 @@
 # Architecture and ownership
 
-codebase-agent-setup is a tooling distribution around official Spec Kit. Runtime code lives in `src/codebase_agent_setup/`. Root launchers keep source-checkout commands usable before installation; machine and Docker setup remain separate entry points.
+codebase-agent-setup manages repository agent configuration, handovers, portable capsules and fleets. Runtime code lives in src/codebase_agent_setup/. The single cbsetup command or python -m codebase_agent_setup works in an installed environment; source runs can use PYTHONPATH=src. Spec Kit provisioning, Docker setup and root launchers are retired.
 
 | Component | Responsibility and data ownership |
 | --- | --- |
-| src/codebase_agent_setup/cli.py, setup_tooling.py | Installed entry point and static/editable dependency-profile setup |
-| configure.py, project/ai_workflow/tools/settings.py | Shared configuration hierarchy, scope/origin resolution and project settings |
-| src/codebase_agent_setup/toolchains.py, upstream.lock.json, requirements.txt | Immutable official-tool selection and compatibility; package_version is a separate mirror |
+| src/codebase_agent_setup/cli.py | Installed command dispatch and static/editable resource reporting |
+| project/ai_workflow/tools/settings.py | Shared configuration hierarchy, scope/origin resolution and project settings |
+| pyproject.toml | Sole package-version source and development dependency pins |
 | src/codebase_agent_setup/install.py, src/codebase_agent_setup/install_transaction.py | Staging, authored-file preservation, managed upgrade ledger, recoverable atomic installation |
-| preset/, extension/ | Composable upstream additions and engineering commands |
-| project/ | Consumer-installed instructions, defaults, schemas and bootstrap/completion utilities |
-| knowledge.py | Optional CGC/Sourcegraph adapter commands, bounded retrieval and checked full-snapshot transfer |
+| src/codebase_agent_setup/ | The one command surface: install, capsule, fleet, handover, configure, knowledge, bootstrap |
+| project/ | Consumer-installed instructions, defaults, schemas, handover and bootstrap utilities |
+| project/ai_workflow/tools/knowledge.py | Runs declared indexers, caches output per file content, resolves worktree → branch → base, and pushes/pulls through declared transport commands |
 | scripts/, .github/workflows/ | Distribution validation, numeric versions, atomic package tags and release artifacts |
 | tests/, project/ai_workflow/tools/test_*.py | Distribution and installed-utility regression evidence |
 
-Consumer state, graph caches, credentials, local overrides and install journals are not shared release source. Authored project guidance can be committed in the consumer repository; generated machine/checkout data uses documented ignored locations. Sourcegraph state is service-owned; CGC indexing/bundles use configured local storage. See the installed [backend guide](../project/ai_workflow/knowledge_backends.md).
+Consumer state, index caches, credentials, local overrides and install journals are not shared release source. Authored project guidance can be committed in the consumer repository; generated machine/checkout data uses documented ignored locations. Index artifacts live under the configured `knowledge.cache_root` and are shared, if at all, through a declared transport — CAS holds no credential of its own. See the installed [knowledge guide](../project/ai_workflow/knowledge.md).
 
-Package build artifacts are disposable under .quality/ or an explicit output directory. Release CI owns commit/run-bound gate evidence and wheel/source validation. Package tag automation does not publish knowledge snapshots or public package releases. Proposed graph/base/overlay ownership is described in [knowledge design](development/knowledge-design.md).
+Package build artifacts are disposable under .quality/ or an explicit output directory. Release CI owns commit/run-bound gate evidence and wheel/source validation. Package tag automation does not publish knowledge snapshots or public package releases. Proposed graph/base/overlay ownership is described in [repository knowledge](../project/ai_workflow/knowledge.md).
 
 Runtime code and CI are self-contained in this repository. Sibling projects inform shared conventions; none is imported at runtime.
 

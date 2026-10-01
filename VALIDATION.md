@@ -5,15 +5,37 @@ Use Git history for superseded evidence.
 
 ## Verified locally
 
+2026-10-01, dev/mvp_0.30, Linux/Python 3.12.12, Ruff 0.16.8:
+`CBSETUP_PACKAGE_TESTS=1 .venv/bin/python scripts/check.py --full` passed with **217 unit/distribution tests
+and 31 payload/bootstrap tests, zero failures and zero skips**. Formatting, lint, contracts and shared-standard
+conformance passed. Static/editable builds and installs ran. Version check and check-pr report 1.1.0, matching main.
+Remote/local tags and GitHub releases are absent; REPOSITORY_VERSIONING_ENABLED is false.
+This supersedes the operational Spec Kit prerequisites below, which are historical evidence only.
+The old 9224bf8 hosted run failed Windows and full integration; this port corrects the diagnosed paths and deleted
+setup calls. Hosted run 36789363776 passed Linux/macOS, analysis, artifacts and full integration, but failed
+Windows with six capsule errors: folder writes translated the bytes after hashing. Capsule files now use binary
+UTF-8 writes, with a folder digest regression assertion. Hosted qualification of this correction is still required.
+The redundant consolidation and two guide branches were backed up and removed; dev/mvp_0.30 is the sole PR branch.
+No new PR, tag or release is created.
+
+Tool-neutral agent guide, handover contract, `--no-speckit`, `--adopt`, automatic Spec Kit provisioning and the
+R-B1/R-B2 fixes (branch `dev/neutral-guide`, 2026-09-29) on Linux/Python 3.12.12: unit profile
+**188 tests (15 optional-tool skips) + 32 bootstrap tests pass**; `scripts/check.py` **GO**; ruff check/format clean;
+opt-in packaging tests (`CBSETUP_PACKAGE_TESTS=1 tests.test_distribution`) 3/3 pass and the built wheel contains the
+new payload files. Provisioning was exercised with mocked commands only; the strict full profile with real
+`SPECIFY_BIN` and hosted CI have not run for this branch.
+
 The CI dependency/evidence fixes passed the strict full gate on Linux/Python 3.13.14:
 **165 tests, no skips, GO** (133 distribution tests and 32 consumer bootstrap tests).
 Default and alternate Spec Kit integrations and actual static/editable package tests
 were enabled. Log: `/tmp/rp-ci-evidence-full.log`.
 
-A fresh `pip install --dry-run --ignore-installed -e '.[dev,all]'` resolved successfully:
-MCP 1.30.0, CodeGraphContext 0.6.13 and Kuzu 0.11.3. Resolver evidence is in
-`/tmp/rp-compatible-dependencies.json`; this verifies resolution, not installation of
-that entire fresh environment. Package metadata and requirements retain the same MCP pin.
+**Historical, superseded 2026-09-30.** A fresh `pip install --dry-run --ignore-installed -e '.[dev,all]'` resolved
+successfully: MCP 1.30.0, CodeGraphContext 0.6.13 and Kuzu 0.11.3. Resolver evidence is in
+`/tmp/rp-compatible-dependencies.json`; this verified resolution, not installation of that entire fresh environment.
+This record is kept because it happened, not because it still applies: the `cgc`, `sourcegraph` and `all` extras were
+removed with those adapters, so `[dev,all]` no longer exists and `[dev]` is the only extra. There are no runtime
+dependencies left to resolve.
 
 Regression coverage checks uploadable NO-GO/test-not-run reports before dependency
 setup, replacement after gate execution, and consistent optional dependency profiles.

@@ -15,7 +15,8 @@ class ResourceTests(unittest.TestCase):
             root = Path(temporary).resolve()
             package = root / "src/codebase_agent_setup"
             package.mkdir(parents=True)
-            (package / "upstream.lock.json").write_text("{}", encoding="utf-8")
+            (package / "project").mkdir()
+            (package / "project/AI_CONTEXT.md").write_text("#", encoding="utf-8")
             (root / "pyproject.toml").write_text('[project]\nname="codebase-agent-setup"\n', encoding="utf-8")
             self.assertEqual(resource_root(package), package)
 
@@ -24,7 +25,6 @@ class ResourceTests(unittest.TestCase):
             root = Path(temporary).resolve()
             package = root / "src/codebase_agent_setup"
             package.mkdir(parents=True)
-            (root / "upstream.lock.json").write_text("{}", encoding="utf-8")
             settings = root / "project/ai_workflow/tools/settings.py"
             settings.parent.mkdir(parents=True)
             settings.touch()

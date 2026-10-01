@@ -11,9 +11,7 @@ include repository-standard.json
 
 include BRANCHING.md
 
-include *.py upstream.lock.json legacy_v6_files.json requirements*.txt environment.yml Dockerfile
+include requirements*.txt environment.yml
 include src/build_support.py
 recursive-include src/codebase_agent_setup *.py
 recursive-include project *.py *.md *.mdc *.json *.yaml LICENSE
-recursive-include preset *.md *.yml
-recursive-include extension *.md *.yml
