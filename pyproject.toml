@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codebase-agent-setup"
-version = "1.1.0"
+version = "1.1.1"
 description = "Tool-neutral agent setup for a fleet of repositories: guides, handover continuity and portable capsules"
 requires-python = ">=3.11"
 readme = "README.md"
