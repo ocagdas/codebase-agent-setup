@@ -48,7 +48,8 @@ starting from 1.1.0, a qualifying ordinary PR merge increments to 1.1.1, regardl
 Latest audit 2026-10-01: the owner enabled REPOSITORY_VERSIONING_ENABLED=true. Repository-scoped App ID/key
 settings are still absent. Feature push/PR runs cannot publish versions regardless of this flag; complete App
 configuration and protection permissions before the qualifying trunk merge. Changing the flag alone does not
-prove a version/tag was published. PR #13's initial CI failed distribution validation; its correction requires a new run.
+prove a version/tag was published. PR #13's initial CI failed distribution validation, corrected in 3105dac;
+its latest run fails Windows privacy assertions. The local newline correction needs a fresh hosted run.
 
 1. Install a repository-scoped GitHub App with Contents read/write permission.
 2. Keep existing variable `CBSETUP_VERSIONING_APP_ID` and secret `CBSETUP_VERSIONING_APP_PRIVATE_KEY` (PEM key). No credential names changed during standardization. The reusable workflow passes the same secret through its internal `versioning-private-key` argument.

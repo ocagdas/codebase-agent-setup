@@ -76,14 +76,13 @@ class PrivacyTests(InstallHarness):
         self.assertTrue(plan["local_only"])
         paths = list(self.ledger()["files"]) + [GUIDE, install.LEDGER]
         ignored = subprocess.run(
-            ["git", "-C", str(self.repo), "check-ignore", "--stdin"],
-            input="\n".join(paths) + "\n",
+            ["git", "-C", str(self.repo), "check-ignore", "--stdin", "-z"],
+            # Git's line protocol treats CR as part of a path on Windows. Use binary NUL framing.
+            input=("\0".join(paths) + "\0").encode("utf-8"),
             capture_output=True,
-            text=True,
-            encoding="utf-8",
             check=True,
         )
-        self.assertEqual(set(ignored.stdout.splitlines()), set(paths))
+        self.assertEqual(set(ignored.stdout.decode("utf-8").rstrip("\0").split("\0")), set(paths))
         result = subprocess.run(
             ["git", "-C", str(self.repo), "check-ignore", "project/AI_CONTEXT.md"], capture_output=True
         )
@@ -98,11 +97,12 @@ class PrivacyTests(InstallHarness):
         self.run_install(track_guidance=True)
         ignore = self.repo / ".gitignore"
         original = ignore.read_text(encoding="utf-8") + "\n# authored rule\n/private-data/\n"
-        ignore.write_text(original, encoding="utf-8")
+        # Exercise Windows-style existing content on every platform.
+        ignore.write_bytes(original.replace("\n", "\r\n").encode("utf-8"))
         plan = self.run_install(upgrade=True)
         self.assertIn("/AI_CONTEXT.md", plan["gitignore_additions"])
         after = ignore.read_bytes()
-        self.assertIn("# authored rule\n/private-data/", after.decode("utf-8"))
+        self.assertIn("# authored rule\n/private-data/", ignore.read_text(encoding="utf-8"))
         self.assertEqual(self.run_install(upgrade=True)["gitignore_additions"], [])
         self.assertEqual(ignore.read_bytes(), after)
 
