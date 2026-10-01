@@ -25,6 +25,12 @@ CBSETUP_PACKAGE_TESTS=1 python scripts/check.py --full
 
 Full mode fails if packaging is disabled or any test is skipped. It covers static/editable distributions and payload installation without Spec Kit or backend adapters. Run the strict profile on Linux; POSIX-only tests are explicitly skipped on Windows. Test results do not certify real indexers, agents or token savings.
 
+CI must work without an installed CAS tree at the checkout root. Distribution validation checks tracked
+project/AGENTS.md; the repository-standard adapter selects that same path through agent_guide. Existing adapters
+without this option still require root AGENTS.md. Regression fixtures copy tracked files only, excluding ignored
+local guidance, and exercise both validators. For tracking/ignore changes, also run the strict gate from a clean
+tracked-files-only checkout; a local gate alone can be masked by ignored files left on disk.
+
 ## Hosted checks and go/no-go integration
 
 `.github/workflows/ci.yml` runs for pull requests, branch pushes, merge queues and manual dispatch. It is also reusable through `workflow_call`. Jobs cover:

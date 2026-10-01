@@ -6,6 +6,7 @@ import io
 import json
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import unittest
 
@@ -66,6 +67,73 @@ class RefusalTests(InstallHarness):
         self.assertIn("approvals", str(caught.exception))
         self.assertFalse((self.repo / "AI_CONTEXT.md").exists())
         self.assertFalse((self.repo / install.LEDGER).exists())
+
+
+class PrivacyTests(InstallHarness):
+    def test_default_ignores_installed_guidance_but_not_product_templates(self):
+        subprocess.run(["git", "init", str(self.repo)], check=True, capture_output=True)
+        plan = self.run_install()
+        self.assertTrue(plan["local_only"])
+        paths = list(self.ledger()["files"]) + [GUIDE, install.LEDGER]
+        ignored = subprocess.run(
+            ["git", "-C", str(self.repo), "check-ignore", "--stdin", "-z"],
+            # Git's line protocol treats CR as part of a path on Windows. Use binary NUL framing.
+            input=("\0".join(paths) + "\0").encode("utf-8"),
+            capture_output=True,
+            check=True,
+        )
+        self.assertEqual(set(ignored.stdout.decode("utf-8").rstrip("\0").split("\0")), set(paths))
+        result = subprocess.run(
+            ["git", "-C", str(self.repo), "check-ignore", "project/AI_CONTEXT.md"], capture_output=True
+        )
+        self.assertEqual(result.returncode, 1)
+
+    def test_dry_run_previews_ignore_additions_without_writing(self):
+        plan = self.run_install(apply=False)
+        self.assertIn("/ai_workflow/", plan["gitignore_additions"])
+        self.assertFalse((self.repo / ".gitignore").exists())
+
+    def test_upgrade_preserves_existing_rules_and_adds_no_duplicates(self):
+        self.run_install(track_guidance=True)
+        ignore = self.repo / ".gitignore"
+        original = ignore.read_text(encoding="utf-8") + "\n# authored rule\n/private-data/\n"
+        # Exercise Windows-style existing content on every platform.
+        ignore.write_bytes(original.replace("\n", "\r\n").encode("utf-8"))
+        plan = self.run_install(upgrade=True)
+        self.assertIn("/AI_CONTEXT.md", plan["gitignore_additions"])
+        after = ignore.read_bytes()
+        self.assertIn("# authored rule\n/private-data/", ignore.read_text(encoding="utf-8"))
+        self.assertEqual(self.run_install(upgrade=True)["gitignore_additions"], [])
+        self.assertEqual(ignore.read_bytes(), after)
+
+    def test_cli_override_keeps_state_private_but_allows_guidance(self):
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(
+                install.main([str(self.repo), "--track-guidance", "--apply", "--user-config", str(self.user)]), 0
+            )
+        lines = (self.repo / ".gitignore").read_text(encoding="utf-8").splitlines()
+        self.assertNotIn("/AI_CONTEXT.md", lines)
+        self.assertNotIn("/ai_workflow/", lines)
+        self.assertIn("/.cbsetup/", lines)
+        self.assertIn("/ai_workflow/settings.local.json", lines)
+
+    def test_override_never_removes_existing_privacy_rules(self):
+        self.run_install()
+        ignore = self.repo / ".gitignore"
+        before = ignore.read_bytes()
+        plan = self.run_install(upgrade=True, track_guidance=True)
+        self.assertFalse(plan["local_only"])
+        self.assertEqual(ignore.read_bytes(), before)
+
+    def test_install_never_untracks_existing_files(self):
+        subprocess.run(["git", "init", str(self.repo)], check=True, capture_output=True)
+        self.run_install(track_guidance=True)
+        subprocess.run(["git", "-C", str(self.repo), "add", "AI_CONTEXT.md"], check=True, capture_output=True)
+        self.run_install(upgrade=True)
+        result = subprocess.run(
+            ["git", "-C", str(self.repo), "ls-files", "AI_CONTEXT.md"], capture_output=True, text=True, check=True
+        )
+        self.assertEqual(result.stdout.strip(), "AI_CONTEXT.md")
 
 
 class InstallModeTests(InstallHarness):

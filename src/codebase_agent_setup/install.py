@@ -12,11 +12,11 @@ import datetime
 
 from .resources import RESOURCE_ROOT as ROOT
 from .project.ai_workflow.tools.settings import resolve
-from . import install_transaction
+from . import install_transaction, templates
 
 # Where this installer records what it manages. Never inside a directory another tool owns.
 LEDGER = install_transaction.STATE + "/install.json"
-# Seeded once, then owned by the repository: never replaced, never recorded as managed.
+# Seeded once, then repository-owned: only explicit override replaces it; never managed.
 INSTALL_ONCE = frozenset({"ai_workflow/project_guide.md"})
 GUIDE = "ai_workflow/project_guide.md"
 # Tool entry files that --adopt migrates into the project guide.
@@ -29,6 +29,18 @@ EXCLUSIONS = (
     ".ai_cache/",
     ".ai_migration_backup/",
     "/ai_workflow/settings.local.json",
+)
+# Root-relative installed copies, not the reusable templates under project/.
+# State/backups remain private even when guidance is intentionally shared.
+LOCAL_EXCLUSIONS = (
+    "/AI_CONTEXT.md",
+    "/AGENTS.md",
+    "/CLAUDE.md",
+    "/GEMINI.md",
+    "/ai_workflow/",
+    "/.cbsetup/",
+    "/.github/copilot-instructions.md",
+    "/.cursor/rules/engineering.mdc",
 )
 
 
@@ -90,26 +102,43 @@ def read_ledger(path):
 
 def install(args):
     target = args.repo.resolve()
+    template_path = getattr(args, "template", None)
+    source_template = templates.snapshot(template_path, target=target) if template_path is not None else None
+    behaviour = getattr(args, "behaviour", None)
+    legacy_replace = getattr(args, "replace_guide", False)
+    if legacy_replace and (source_template is None or getattr(args, "adopt", False)):
+        raise RuntimeError("--replace-guide requires --template and cannot be combined with --adopt")
+    override = behaviour == "override"
+    preserve = behaviour == "preserve"
+    replace_guide = override or legacy_replace
+    if override and getattr(args, "adopt", False):
+        raise RuntimeError("--behaviour override cannot be combined with --adopt")
     install_transaction.recover(target, apply=args.apply)
-    upgrade = getattr(args, "upgrade", False)
+    upgrade = behaviour == "upgrade" or (behaviour is None and getattr(args, "upgrade", False))
     if getattr(args, "remove_obsolete", False) and not upgrade:
-        raise RuntimeError("--remove-obsolete requires --upgrade, which establishes what this installer manages")
+        raise RuntimeError("--remove-obsolete requires upgrade behaviour (--behaviour upgrade / --upgrade)")
     overrides = {"agent": {"integrations": args.integration}} if args.integration else {}
     effective = resolve(target, getattr(args, "user_config", None), overrides)["settings"]
     integrations = list(dict.fromkeys(effective["agent"]["integrations"]))
     with tempfile.TemporaryDirectory(prefix="cbsetup_stage_") as temp:
         stage = Path(temp) / "project"
         stage.mkdir()
-        for source in files(ROOT / "project"):
-            relative = source.relative_to(ROOT / "project")
-            dest = stage / relative
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, dest)
-        # Install-once files belong to the repository after seeding; an existing copy is never replaced.
+        if source_template is not None:
+            for relative, content in source_template.files.items():
+                dest = stage / relative
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_bytes(content)
+        else:
+            for source in files(ROOT / "project"):
+                relative = source.relative_to(ROOT / "project")
+                dest = stage / relative
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, dest)
+        # Repository-owned files are kept unless replacement was explicitly requested.
         keep_existing = sorted(
             relative
             for relative in INSTALL_ONCE
-            if (target / relative).is_file() and not (target / relative).is_symlink()
+            if (target / relative).is_file() and not (target / relative).is_symlink() and not replace_guide
         )
         for relative in keep_existing:
             (stage / relative).unlink()
@@ -128,7 +157,7 @@ def install(args):
             for name in set(incoming) | {".gitignore", LEDGER}
         }
         ledger = read_ledger(target / LEDGER)
-        if upgrade and not ledger:
+        if upgrade and not ledger and behaviour is None:
             raise RuntimeError(
                 "Upgrade needs an installation ledger from this installer; preserve/merge older installations manually"
             )
@@ -141,9 +170,11 @@ def install(args):
             elif dest.exists() and relative not in adopted:
                 if not dest.is_file() or digest(dest) != digest(source):
                     previous_hash = ledger.get("files", {}).get(relative)
-                    if upgrade and dest.is_file() and previous_hash and digest(dest) == previous_hash:
+                    if dest.is_file() and (override or (relative == GUIDE and replace_guide)):
                         replacements.append(relative)
-                    elif upgrade and dest.is_file():
+                    elif upgrade and dest.is_file() and previous_hash and digest(dest) == previous_hash:
+                        replacements.append(relative)
+                    elif (upgrade or preserve) and dest.is_file():
                         # Authored files remain authoritative; report every retained difference.
                         preserved.append(relative)
                     else:
@@ -153,6 +184,10 @@ def install(args):
             conflicts.append(".gitignore (not a regular file)")
         if conflicts:
             raise RuntimeError("No target writes made. Resolve these collisions:\n" + "\n".join(sorted(set(conflicts))))
+        local_only = not getattr(args, "track_guidance", False)
+        existing_ignore = ignore_target.read_text(encoding="utf-8") if ignore_target.exists() else ""
+        exclusions = EXCLUSIONS + (LOCAL_EXCLUSIONS if local_only else ("/.cbsetup/",))
+        missing_ignore = [line for line in exclusions if line not in existing_ignore.splitlines()]
         # Managed files the payload no longer ships.
         dropped = set(ledger.get("files", {})) - set(incoming)
         removable, obsolete_modified = [], []
@@ -177,6 +212,15 @@ def install(args):
             "files_to_install": len(incoming),
             "apply": args.apply,
             "upgrade": upgrade,
+            "behaviour": behaviour or ("upgrade" if upgrade else "preserve"),
+            "template": str(source_template.root) if source_template else None,
+            "template_fingerprint": source_template.fingerprint if source_template else None,
+            "replace_guide": replace_guide,
+            "local_only": local_only,
+            "gitignore_additions": missing_ignore,
+            "privacy_warning": "Ignore rules do not untrack existing files, erase Git history, or prevent "
+            "cloud tools from reading files. Never put credentials in guidance. "
+            "--track-guidance does not remove existing ignore rules.",
             "keep_existing": keep_existing,
             "adopted": adopted,
             "referenced_guidance": referenced,
@@ -211,12 +255,20 @@ def install(args):
             original.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(target / relative, original)
             writes[(backup / relative).relative_to(target).as_posix()] = original
-        ignore = target / ".gitignore"
-        existing = ignore.read_text(encoding="utf-8") if ignore.exists() else ""
-        missing = [line for line in EXCLUSIONS if line not in existing.splitlines()]
-        if missing:
+        if override or legacy_replace:
+            backup_files = replacements if override else ([GUIDE] if GUIDE in writes else [])
+            for relative in backup_files:
+                if not (target / relative).is_file():
+                    continue
+                original = stage / ".overridden" / relative
+                original.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(target / relative, original)
+                writes[(backup / relative).relative_to(target).as_posix()] = original
+        if missing_ignore:
             staged_ignore = stage / ".install-ignore"
-            staged_ignore.write_text(existing.rstrip("\n") + "\n" + "\n".join(missing) + "\n", encoding="utf-8")
+            staged_ignore.write_text(
+                existing_ignore.rstrip("\n") + "\n" + "\n".join(missing_ignore) + "\n", encoding="utf-8"
+            )
             writes[".gitignore"] = staged_ignore
         manifest_files = dict(ledger.get("files", {}))
         for relative in removals:
@@ -239,6 +291,8 @@ def install(args):
             },
         )
         writes[LEDGER] = staged_ledger
+        if source_template is not None:
+            templates.verify(source_template)
         install_transaction.apply_writes(target, writes, expected=observed)
         print(
             "Installed the agent guide. Fill in ai_workflow/project_guide.md and set handover.path "
@@ -250,18 +304,21 @@ def add_arguments(parser):
     parser.add_argument("repo", type=Path)
     parser.add_argument("--integration", action="append", choices=["codex", "cursor-agent", "copilot"])
     parser.add_argument("--user-config", type=Path)
+    parser.add_argument("--template", type=Path, help="Install from a validated editable template directory")
+    add_behaviour_arguments(parser)
     parser.add_argument(
-        "--upgrade",
+        "--track-guidance",
         action="store_true",
-        help="Preview/apply updates only to unchanged managed files; preserve authored differences",
+        help="Opt into sharing installed guidance: do not add its local-only .gitignore rules. "
+        "Install state/backups/local settings stay ignored; existing rules and tracked files are not untracked",
     )
     parser.add_argument(
         "--remove-obsolete",
         action="store_true",
-        help="With --upgrade, archive and delete managed files the payload no longer ships; "
+        help="With upgrade behaviour, archive and delete managed files the payload no longer ships; "
         "locally edited ones are always kept and reported",
     )
-    parser.add_argument("--apply", action="store_true", help="Apply the validated staging plan")
+    add_write_arguments(parser)
     parser.add_argument(
         "--adopt",
         action="store_true",
@@ -269,6 +326,26 @@ def add_arguments(parser):
         "ai_workflow/project_guide.md for review, back up the originals and install the standard pointers",
     )
     return parser
+
+
+def add_write_arguments(parser):
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--dry-run", dest="apply", action="store_false", help="Validate and preview; write nothing")
+    group.add_argument("--apply", dest="apply", action="store_true", help=argparse.SUPPRESS)
+    parser.set_defaults(apply=True)
+
+
+def add_behaviour_arguments(parser):
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--behaviour",
+        choices=("preserve", "upgrade", "override"),
+        default="upgrade",
+        help="preserve: add missing files; upgrade (default): update unchanged managed files; "
+        "override: replace supported files, including the guide, with backups",
+    )
+    group.add_argument("--upgrade", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--replace-guide", action="store_true", help=argparse.SUPPRESS)
 
 
 def main(argv=None):

@@ -128,8 +128,15 @@ class StatusTests(FleetHarness):
 
 
 class ApplyTests(FleetHarness):
-    def test_dry_run_is_the_default_and_touches_nothing(self):
-        result = fleet.apply(fleet.load(self.file), fleet.Options())
+    def test_fleet_defaults_to_local_only_with_an_explicit_override(self):
+        result = fleet.apply(fleet.load(self.file), fleet.Options(apply=False))
+        self.assertTrue(result["repositories"][0]["local_only"])
+        result = fleet.apply(fleet.load(self.file), fleet.Options(apply=False, track_guidance=True))
+        self.assertFalse(result["repositories"][0]["local_only"])
+        self.assertNotIn("/AI_CONTEXT.md", result["repositories"][0]["gitignore_additions"])
+
+    def test_explicit_dry_run_touches_nothing(self):
+        result = fleet.apply(fleet.load(self.file), fleet.Options(apply=False))
         self.assertFalse(result["apply"])
         self.assertEqual(list(self.repos["open-repo"].rglob("*")), [])
 
@@ -146,12 +153,12 @@ class ApplyTests(FleetHarness):
 
     def test_one_failing_repository_does_not_stop_the_others_and_is_reported(self):
         collision = self.repos["open-repo"] / "AI_CONTEXT.md"
-        collision.write_text("authored, unmanaged\n", encoding="utf-8")
+        collision.mkdir()
         result = fleet.apply(fleet.load(self.file), fleet.Options(apply=True, include_owner_only=True))
         failed = {row["repository"]: row for row in result["failed"]}
         self.assertIn("open-repo", failed)
         self.assertIn("AI_CONTEXT.md", failed["open-repo"]["error"])
-        self.assertEqual(collision.read_text(encoding="utf-8"), "authored, unmanaged\n")
+        self.assertTrue(collision.is_dir())
         self.assertTrue((self.repos["owner-repo"] / "AI_CONTEXT.md").is_file())
 
     def test_a_second_apply_reports_each_repository_as_already_current(self):

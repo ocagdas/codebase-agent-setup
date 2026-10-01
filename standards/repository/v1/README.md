@@ -20,6 +20,9 @@ Run only a trusted/reviewed helper, never executable code from arbitrary CI arti
 Create a repository-owned `repository-standard.json` with contract_version 1.0.0,
 project, required_jobs, version_mirror, trunk_variable, publication and license_profile.
 codebase-agent-setup's file is an example, not something to overwrite onto another product.
+The optional agent_guide selects AGENTS.md (the default) or project/AGENTS.md for a tooling distribution.
+It changes only the required agent-document location, not any other documentation or quality requirement.
+Existing adapters retain their root-guide contract. CAS uses the tracked payload; ignored installed copies are not evidence.
 The design at docs/development/repository-standard-design.md defines exact semantics,
 including superseded status for any advanced remote and explicit candidate builds.
 

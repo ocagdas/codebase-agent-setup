@@ -54,6 +54,15 @@ class PayloadTests(unittest.TestCase):
         self.assertIn("<!-- cbsetup:unfilled -->", text)
         self.assertNotIn("CUSTOMISE", text)
 
+    def test_installed_settings_guide_is_small_and_not_an_admin_manual(self):
+        text = self.read("ai_workflow/settings.md")
+        self.assertLessEqual(len(text.splitlines()), 35)
+        self.assertIn("settings.py inspect --repo .", text)
+        self.assertIn("settings.py handover --repo .", text)
+        self.assertIn("CAS documentation", text)
+        for retired in ("setup_tooling.py", "configure.py", "install.py", "speckit.ref", "cgc.data_dir"):
+            self.assertNotIn(retired, text)
+
     def test_handover_contract_lists_required_sections(self):
         sys.path.insert(0, str(PROJECT / "ai_workflow/tools"))
         import validate_handover

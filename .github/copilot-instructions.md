@@ -1,1 +1,0 @@
-Read `AI_CONTEXT.md` completely and follow its loading order. It is the single guide for every coding assistant in this repository; repository-specific rules are in `ai_workflow/project_guide.md`. This file only provides discovery.

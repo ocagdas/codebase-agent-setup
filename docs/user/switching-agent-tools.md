@@ -10,20 +10,22 @@ guidance, and every tool keeps the same handover document up to date.
 | --- | --- | --- |
 | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`, `.cursor/rules/engineering.mdc` | installer | One-line pointers to `AI_CONTEXT.md` |
 | `AI_CONTEXT.md` | installer | Tool-neutral loading order, working rules and handover rules |
-| `ai_workflow/project_guide.md` | repository | Purpose, document owners, commands, policies, hazards. Seeded once, never overwritten |
+| `ai_workflow/project_guide.md` | repository | Purpose, document owners, commands, policies, hazards. Preserved unless explicitly overridden |
 | `ai_workflow/handover.md`, `ai_workflow/tools/validate_handover.py` | installer | Handover contract, template and validator |
 
-Upgrades (`--upgrade`) replace installer-owned files only when you have not edited them, and never touch
+Upgrades (the default behaviour) replace installer-owned files only when you have not edited them, and never touch
 `project_guide.md`.
 
 ## Seed a repository
 
 ```bash
 # Guide, pointers and handover contract
-codebase-agent-setup install /path/to/repo --apply
+codebase-agent-setup install /path/to/repo
 ```
 
-Omit --apply to preview. CAS requires no external CLI and no longer installs or manages Spec Kit.
+Add --dry-run to preview without writes. Use --behaviour preserve to add missing files only or --behaviour override
+to replace supported CAS files, including the guide, with backups. CAS requires no external CLI and no longer
+installs or manages Spec Kit.
 
 ### Repositories that already have agent files
 

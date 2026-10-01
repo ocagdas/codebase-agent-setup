@@ -14,10 +14,16 @@ git push -u origin main
 
 No remote has been created or pushed by this task. Choose a licence and ownership notice before publishing the custom material publicly. The included NOTICE.md identifies official upstream; the custom package is not an official GitHub product.
 
-This tooling repository is distinct from your firmware, service or data science repository. Install it into those repositories with install.py. Commit the agreed generated project instructions there so every clone receives the same workflow version.
+This tooling repository is distinct from target repositories. Install with cbsetup install /path/to/repo (writes
+by default); add --dry-run to preview. Installed guidance stays ignored by default. Only share reviewed guidance
+intentionally with --track-guidance; it does not remove existing ignores or change Git tracking.
 
 No .github/workflows/validate.yml is currently included. Run the local checks in CONTRIBUTING.md before publishing. Adding a regression workflow for the pinned Spec Kit CLI, platform tests and Docker checks is follow-up work; pushing this checkout alone will not run those checks. Record remote results in VALIDATION.md only after the jobs actually execute.
 
 Keep upstream.lock.json and requirements.txt in agreement. Retest a new official Spec Kit version before changing the pin. The preset and extension compatibility requirements must change in the same review. Installation verifies the selected CLI version and stages compatibility checks. Personal release/commit overrides leave the distribution pin unchanged; see docs/user/toolchain-versions.md.
 
-Retain existing project commands and authored documents when upgrading. Initial installation rejects conflicting files. For installations with an engineering-install.json ledger, install.py --upgrade previews updates to unchanged managed files while preserving authored differences; --apply performs the reviewed update. Older installations without that ledger require manual reconciliation. See docs/user/toolchain-versions.md.
+Retain project commands and authored documents when upgrading. Default --behaviour upgrade updates unchanged
+managed files and preserves authored differences and project guides. Without a .cbsetup/install.json ledger,
+missing files are seeded and unknown existing files retained. --behaviour preserve adds missing files only;
+--behaviour override replaces supported CAS files, including the guide, with backups. See
+[editable templates](../user/templates.md) for single/fleet application and privacy boundaries.
