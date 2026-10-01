@@ -41,10 +41,14 @@ class Entry(NamedTuple):
 
 
 class Options(NamedTuple):
-    apply: bool = False
+    apply: bool = True
     upgrade: bool = False
     include_owner_only: bool = False
     user_config: Path = None
+    track_guidance: bool = False
+    template: Path = None
+    replace_guide: bool = False
+    behaviour: str = "upgrade"
 
 
 def load(path):
@@ -123,7 +127,8 @@ def status(entries):
 def apply(entries, options):
     result = {
         "apply": options.apply,
-        "upgrade": options.upgrade,
+        "upgrade": options.behaviour == "upgrade" or (options.behaviour is None and options.upgrade),
+        "behaviour": options.behaviour,
         "repositories": [],
         "skipped_owner_only": [],
         "skipped_missing": [],
@@ -144,6 +149,10 @@ def apply(entries, options):
             apply=options.apply,
             adopt=False,
             remove_obsolete=False,
+            track_guidance=options.track_guidance,
+            template=options.template,
+            replace_guide=options.replace_guide,
+            behaviour=options.behaviour,
         )
         captured = io.StringIO()
         try:
@@ -189,9 +198,11 @@ def main(argv=None):
     look = sub.add_parser("status", help="One row per repository: managed files, drift, guide state")
     look.add_argument("--json", action="store_true", help="Machine-readable output instead of the table")
     act = sub.add_parser("apply", help="Install or upgrade the managed guide across the fleet")
-    act.add_argument("--apply", action="store_true", help="Write the changes")
+    install.add_write_arguments(act)
+    install.add_behaviour_arguments(act)
+    act.add_argument("--template", type=Path, help="Use one validated editable template for the selected targets")
     act.add_argument(
-        "--upgrade", action="store_true", help="Refresh unmodified managed files, preserving authored ones"
+        "--track-guidance", action="store_true", help="Opt out of adding guidance ignore rules; state stays ignored"
     )
     act.add_argument(
         "--include-owner-only",
@@ -212,6 +223,10 @@ def main(argv=None):
                 upgrade=args.upgrade,
                 include_owner_only=args.include_owner_only,
                 user_config=args.user_config,
+                track_guidance=args.track_guidance,
+                template=args.template,
+                replace_guide=args.replace_guide,
+                behaviour=args.behaviour,
             ),
         )
         print(json.dumps(result, indent=2))

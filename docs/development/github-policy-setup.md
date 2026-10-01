@@ -16,8 +16,11 @@ or upgrade a billing plan. Read the final readiness record before enabling mutat
   GitHub reports that private rulesets require a plan upgrade. REPOSITORY_TRUNK=master
   and REPOSITORY_VERSIONING_ENABLED=false are configured. No branch rename is needed.
 
-These settings were inspected/applied on 10 September 2026. The workflow/code delta
-is still uncommitted. A successful current-candidate hosted CI run remains required.
+The original settings audit was 10 September 2026. CAS was rechecked on 1 October 2026:
+main CI run 36847270196 passed, with its version/tag job skipped; REPOSITORY_VERSIONING_ENABLED=false.
+The CAS App ID variable and private-key secret are absent at repository scope, and both active rulesets have
+administrator-only bypass (no App). No GitHub tags exist. App provisioning/activation remains outstanding;
+the newer local feature changes need their own hosted qualification. Other repository settings were not rechecked.
 
 ## ACF owner: complete trunk and protection setup
 

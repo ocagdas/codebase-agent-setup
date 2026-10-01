@@ -124,6 +124,41 @@ class DistributionTests(unittest.TestCase):
                     )
                 )
                 self.assertEqual(prepared["action_required"], "full_analysis")
+                # Real static/editable entry points must export and install custom templates.
+                custom = base / (mode + "-template")
+                subprocess.run(
+                    [str(launcher), "template", "create", str(custom)],
+                    cwd=base,
+                    check=True,
+                    capture_output=True,
+                )
+                guide = custom / "ai_workflow/project_guide.md"
+                guide.write_text("# Custom packaged guide\n", encoding="utf-8")
+                custom_target = base / (mode + "-custom-target")
+                subprocess.run(
+                    [str(launcher), "install", str(custom_target), "--template", str(custom)],
+                    cwd=base,
+                    check=True,
+                    capture_output=True,
+                )
+                self.assertEqual(
+                    (custom_target / "ai_workflow/project_guide.md").read_text(encoding="utf-8"),
+                    "# Custom packaged guide\n",
+                )
+                fleet_target = base / (mode + "-fleet-target")
+                fleet_target.mkdir()
+                fleet_file = base / (mode + "-fleet.json")
+                fleet_file.write_text(
+                    json.dumps({"schema_version": "1.0", "repositories": [{"path": str(fleet_target)}]}),
+                    encoding="utf-8",
+                )
+                subprocess.run(
+                    [str(launcher), "fleet", "--file", str(fleet_file), "apply", "--template", str(custom)],
+                    cwd=base,
+                    check=True,
+                    capture_output=True,
+                )
+                self.assertEqual((fleet_target / "ai_workflow/project_guide.md").read_bytes(), guide.read_bytes())
             # A static distribution may be vendored into another project's src/.
             vendored = base / "consumer-project" / "src" / "codebase_agent_setup"
             vendored.parent.mkdir(parents=True)

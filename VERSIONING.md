@@ -38,6 +38,13 @@ A version commit and tag are pushed together using `git push --atomic`, without 
 
 ## GitHub activation
 
+Verified 2026-10-01: main CI [run 36847270196](https://github.com/ocagdas/codebase-agent-setup/actions/runs/36847270196)
+passed its Quality gate, but Version and tag trunk was skipped. REPOSITORY_VERSIONING_ENABLED is false;
+CBSETUP_VERSIONING_APP_ID and CBSETUP_VERSIONING_APP_PRIVATE_KEY are not configured at repository scope.
+Active main/v* rulesets currently permit administrator bypass only, not a versioning App. No tags exist.
+Complete the App configuration/bypass below before enabling mutation. Branch names do not select package versions:
+starting from 1.1.0, a qualifying ordinary PR merge increments to 1.1.1, regardless of its dev branch suffix.
+
 1. Install a repository-scoped GitHub App with Contents read/write permission.
 2. Keep existing variable `CBSETUP_VERSIONING_APP_ID` and secret `CBSETUP_VERSIONING_APP_PRIVATE_KEY` (PEM key). No credential names changed during standardization. The reusable workflow passes the same secret through its internal `versioning-private-key` argument.
 3. Set `CBSETUP_VERSIONING_ACTOR` to the App bot login for commit identity; its default remains `codebase-agent-setup-versioning[bot]`. Loop prevention now relies on the exact existing tag, rather than the former `[skip ci-version]` message/actor guard. Existing tagged commits remain no-ops; no message migration is needed.

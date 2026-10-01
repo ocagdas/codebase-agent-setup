@@ -4,7 +4,8 @@ This is the tooling distribution's actionable backlog. Consumer feature work sti
 
 ## Priority now (P1 stabilization)
 
-- Qualify dev/mvp_0.30 on hosted CI, including Windows and the strict packaging profile. Spec Kit provisioning and its toolchain gates are retired.
+- Qualify dev/mvp_1.1.1 on hosted CI after owner review/publication. MVP #12/main CI already passed; the new
+  privacy/template/behaviour changes are only locally qualified. Spec Kit provisioning and its toolchain gates are retired.
 
 - Configure the versioning App variables/secret and narrowly scoped App bypass described in VERSIONING.md; branch/tag rules are active. Enable REPOSITORY_VERSIONING_ENABLED only after App setup.
 - Run hosted CI and tag-triggered release readiness; prove the active Quality gate rule blocks failing PRs and verify commit/run evidence and App publication on the selected trunk.

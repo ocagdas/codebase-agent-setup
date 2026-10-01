@@ -11,6 +11,12 @@ codebase-agent-setup is ready for a project pilot. pyproject.toml is the sole pa
 - Local Git inventories and file branch deltas, integrity-bound bootstrap requests, incremental record reuse and SHA-1/SHA-256 repository support.
 - Static/editable codebase-agent-setup installations with native/venv/Conda setup paths. Zero runtime dependencies; the only extra is the maintainer toolchain.
 - Conservative install/upgrade with authored-file preservation, recoverable transactions, OS-owned locks and opt-in archival of obsolete managed files.
+- Local-only guidance by default: missing root-relative Git ignores are previewed and installed transactionally;
+  `--track-guidance` opts out for intentional sharing without changing existing ignores or the Git index.
+- Editable built-in templates: `template create`, single/fleet `--template` installation, validated source paths
+  and content, source-change checks, and backed-up `--behaviour override`. Install/template/fleet write by default
+  with `--dry-run` previews; `--behaviour preserve|upgrade|override` defaults to upgrade. Installed settings docs are slim;
+  administration belongs in CAS user docs. Live-repo export and full-guidance capsule recovery remain future work.
 - Community documentation and pinned CI for formatting, analysis, contract checks, unit/platform matrices, strict integration and wheel/source payload verification.
 - Quality-gated package bump/tag automation, configurable release trunk, atomic publication and common version/gate interfaces. Public GitHub Release/PyPI publication remains disabled.
 

@@ -10,6 +10,9 @@ read, keeps a handover document current as work moves between them, and captures
 
 Python 3.11+. **No runtime dependencies** — standard library only.
 
+Runs on Linux, macOS and Windows. CI tests Python 3.11–3.13 on Linux and Python 3.13 on macOS/Windows.
+External Git/indexer/transport commands need to be installed separately for the features that use them.
+
 > **Status: pre-release.** Working and used daily on a four-repository fleet, but not yet on PyPI, and the command
 > surface may still change. See [what is not done yet](#what-is-not-done-yet).
 
@@ -30,7 +33,7 @@ handover notes you keep outside the repository.
 | **Session continuity** | A handover contract every tool reads at the start, verifies against the code, and updates before it stops. |
 | **Portable capture** | `capsule` packs the ungittable half of your setup into a reviewable archive. Apply it elsewhere and you have a clone. |
 | **A fleet, not a repo** | `fleet status` tells you in one table which of your repositories has drifted. `fleet apply` fixes them together. |
-| **Nothing clobbered** | A ledger records what the tool owns. Files you edited are preserved and reported, never silently overwritten. |
+| **Your choice of updates** | Upgrade preserves edits; explicit override replaces supported CAS files with backups. |
 | **Secrets never travel** | Redaction is unconditional. Every removal is printed on capture *and* on apply, so you know exactly what to put back. |
 
 ---
@@ -66,8 +69,8 @@ a script.
 
 ```bash
 cd ~/code/my-app
-cbsetup install .            # previews; writes nothing
-cbsetup install . --apply
+cbsetup install . --dry-run  # preview; writes nothing
+cbsetup install .            # apply (upgrade is the default behaviour)
 ```
 
 You now have:
@@ -77,7 +80,7 @@ AI_CONTEXT.md                      the guide every tool reads (managed by cbsetu
 AGENTS.md  CLAUDE.md  GEMINI.md    one-line pointers to it
 .github/copilot-instructions.md
 .cursor/rules/engineering.mdc
-ai_workflow/project_guide.md       YOUR rules — seeded once, never overwritten again
+ai_workflow/project_guide.md       YOUR rules — preserved unless explicitly overridden
 ai_workflow/handover.md            the handover contract
 ai_workflow/settings.*             settings schema and reference
 ai_workflow/tools/                 stdlib-only helpers the guide refers to
@@ -87,9 +90,46 @@ ai_workflow/tools/                 stdlib-only helpers the guide refers to
 That is 22 managed files in total, plus the install-once authored project guide.
 `cbsetup install` prints the exact list before it writes anything.
 
+### Local-only by default
+
+Install and upgrade add missing root-relative `.gitignore` rules for the installed guidance, project guide and
+`.cbsetup/` state. The plan lists `gitignore_additions`; installs write them transactionally with the payload.
+Use `--dry-run` to preview without writing anything.
+Existing rules are preserved and repeated installs do not duplicate CAS's rules. Reusable templates under CAS's
+`project/` source directory are not ignored by these root-relative rules.
+
+To intentionally share reviewed guidance instead:
+
+```bash
+cbsetup install . --track-guidance
+# Also supported by: cbsetup fleet --file fleet.json apply --track-guidance
+```
+
+This option skips adding guidance ignore rules; it does not remove existing rules. Install state, backups and
+local settings remain ignored. CAS never changes the Git index: already tracked files must be explicitly untracked
+by their owner while preserving local copies. Ignoring/untracking does not erase remote history, prevent `git add -f`,
+or prevent a cloud assistant from reading/uploading files. Never put credentials in guidance; keep them in dedicated
+local credential storage or environment variables. A `.gitignore` is not a secret scanner or a security boundary.
+
+### Edit a reusable template, then apply it
+
+```bash
+cbsetup template create /path/to/team-template
+# Edit its guidance locally, then preview/apply:
+cbsetup install /path/to/repo --template /path/to/team-template --dry-run
+cbsetup install /path/to/repo --template /path/to/team-template
+cbsetup fleet --file /path/to/fleet.json apply --template /path/to/team-template
+```
+
+Creation applies by default; --dry-run previews, and nonempty destinations are refused. Templates stay outside target directories;
+only supported guidance paths are accepted, not state or credentials. Filled target project guides are preserved
+unless --behaviour override explicitly requests a backed-up replacement. Upgrade is the default for fresh and existing targets.
+See [editable templates](docs/user/templates.md) for trust, validation, fleet policy and recovery limits, and
+[settings administration](docs/user/settings.md) for configuration. Installed docs focus on repository work.
+
 **The one manual step:** fill in `ai_workflow/project_guide.md` — what this repository is, which commands to run,
-what an agent must never do. It ships as a template and `cbsetup` never touches it again, so put real rules there
-rather than in the managed files. Asking your agent to fill it in from the codebase works well.
+what an agent must never do. Put real rules there rather than in the managed files. Ordinary upgrades preserve it;
+explicit override replaces it with a backup. Asking your agent to fill it in from the codebase works well.
 
 Then tell `cbsetup` where the handover document lives and check it:
 
@@ -118,20 +158,23 @@ backs the originals up under `.ai_migration_backup/`, installs the standard poin
 guidance documents those files referenced so nothing gets lost:
 
 ```bash
-cbsetup install . --adopt --apply
+cbsetup install . --adopt
 ```
 
-Without `--adopt`, an existing `AGENTS.md` is a hard collision and nothing is written. That is deliberate.
+Without `--adopt`, upgrade preserves unknown authored files and reports them; it does not claim ownership of them.
 
 ### Keeping a repository up to date
 
 ```bash
-cbsetup install . --upgrade --apply
+cbsetup install .
 ```
 
 Refreshes managed files you have not touched, **preserves** the ones you edited and lists them as
 `preserve_authored`. Add `--remove-obsolete` to retire managed files a newer version no longer ships; they are
 archived to `.ai_migration_backup/` first, and anything you edited is always kept.
+
+Use `--behaviour preserve` to add missing files only, or `--behaviour override` to replace supported CAS files
+including the project guide, backing up changed originals. Override does not touch local settings or unrelated files.
 
 ### 2. Many repositories
 
@@ -164,8 +207,8 @@ At a glance: `shared-lib` has one managed file someone edited by hand, `client-w
 `shared-lib`'s project guide is still the unfilled template. Then bring them all into line:
 
 ```bash
-cbsetup fleet apply --upgrade            # previews every repository
-cbsetup fleet apply --upgrade --apply
+cbsetup fleet apply --dry-run            # preview every selected repository
+cbsetup fleet apply                      # apply with default upgrade behaviour
 ```
 
 **`publication: "owner-only"`** marks a repository where a human makes the changes. `fleet apply` skips it unless you
@@ -274,7 +317,10 @@ cbsetup knowledge            Optional retrieval backends (off by default)
 cbsetup bootstrap            Optional local inventories
 ```
 
-Every command that writes **previews by default**. Nothing happens without `--apply`.
+Install, template creation and fleet apply write by default; use `--dry-run` to preview.
+Other commands retain their existing write controls (for example capsule restore requires `--apply`).
+Old install/fleet `--apply`, `--upgrade` and `--replace-guide` flags remain hidden compatibility aliases;
+use `--behaviour` for new workflows.
 
 ---
 
@@ -282,9 +328,10 @@ Every command that writes **previews by default**. Nothing happens without `--ap
 
 These are the rules the code is held to, not aspirations:
 
-1. **Preview by default.** Every mutating command prints its plan and exits unless you pass `--apply`.
+1. **Explicit previews.** Install, template creation and fleet apply support `--dry-run` with no target writes.
 2. **Your files are yours.** A managed file you edited is preserved and reported. A file seeded once
-   (`project_guide.md`) is never replaced. Collisions stop the whole operation rather than resolving themselves.
+   (`project_guide.md`) is preserved by default. Explicit override replaces supported files with backups.
+   Unsafe path and non-file collisions stop the operation.
 3. **Writes are transactional.** A journal is written before target writes, with a per-checkout lock and rollback.
    An interrupted install recovers and refuses to overwrite anything you changed afterwards.
 4. **Secrets never travel, ever.** No flag, no config key, no environment variable enables it. Every redaction is

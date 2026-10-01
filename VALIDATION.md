@@ -5,6 +5,27 @@ Use Git history for superseded evidence.
 
 ## Verified locally
 
+2026-10-01, dev/mvp_1.1.1 (renamed from dev/local-only-install), Linux/Python 3.12.12: strict
+`CBSETUP_PACKAGE_TESTS=1 .venv/bin/python scripts/check.py --full` passed **245 distribution/unit + 31 payload
+tests, no failures or skips**, including static/editable builds and installs. Ruff, contracts and shared conformance
+passed; version and check-pr remain 1.1.0. New privacy regressions cover actual Git ignore behavior, preview-only
+writes, preserved rules, idempotent upgrades, explicit CLI sharing and fleet override, and unchanged tracking.
+Editable template coverage includes real CLI export/edit/single/fleet preview/apply, static-wheel and editable
+installation flows, source mutation detection, supported inventory/secret-shape validation, no script execution,
+author-owned guide preservation and explicit replacement with backup/rollback. Installed settings guide is 26 lines;
+administration lives in CAS user docs. Seven local installations were refreshed with filled guides unchanged,
+zero drift/missing files. Branch policy and whitespace checks passed. Latest full log: /tmp/cas-behaviour-full.log.
+Install, template creation and fleet now apply by default, with --dry-run previews. --behaviour defaults to upgrade;
+preserve adds missing files, override backs up and replaces supported files including the guide. Tests cover all
+modes, unknown unowned-file preservation, unrelated/local-settings preservation, rollback, invalid/conflicting CLI
+flags and built-in override. Actual static/editable launchers exercise default writes; capsule/config controls are unchanged.
+Source/tests/docs remain uncommitted/unpushed. This feature has no hosted CI evidence yet.
+
+Prior MVP revision 4e3d4ea passed hosted run 36847221902: Linux Python 3.11/3.12/3.13, macOS 14/Python 3.13,
+Windows/Python 3.13, analysis, distribution artifacts and strict Linux integration. MVP PR #12 is merged on main.
+
+Historical MVP local evidence follows:
+
 2026-10-01, dev/mvp_0.30, Linux/Python 3.12.12, Ruff 0.16.8:
 `CBSETUP_PACKAGE_TESTS=1 .venv/bin/python scripts/check.py --full` passed with **217 unit/distribution tests
 and 31 payload/bootstrap tests, zero failures and zero skips**. Formatting, lint, contracts and shared-standard
@@ -14,9 +35,9 @@ This supersedes the operational Spec Kit prerequisites below, which are historic
 The old 9224bf8 hosted run failed Windows and full integration; this port corrects the diagnosed paths and deleted
 setup calls. Hosted run 36789363776 passed Linux/macOS, analysis, artifacts and full integration, but failed
 Windows with six capsule errors: folder writes translated the bytes after hashing. Capsule files now use binary
-UTF-8 writes, with a folder digest regression assertion. Hosted qualification of this correction is still required.
-The redundant consolidation and two guide branches were backed up and removed; dev/mvp_0.30 is the sole PR branch.
-No new PR, tag or release is created.
+UTF-8 writes, with a folder digest regression assertion. Hosted qualification subsequently passed as recorded above.
+The redundant consolidation and two guide branches were backed up and removed; MVP PR #12 was merged by the owner.
+No tag or release was created by this work.
 
 Tool-neutral agent guide, handover contract, `--no-speckit`, `--adopt`, automatic Spec Kit provisioning and the
 R-B1/R-B2 fixes (branch `dev/neutral-guide`, 2026-09-29) on Linux/Python 3.12.12: unit profile

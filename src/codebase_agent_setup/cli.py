@@ -8,6 +8,7 @@ import sys
 from .resources import PACKAGE_ROOT as ROOT, RESOURCE_ROOT
 
 COMMANDS = {
+    "template": ("templates", "Create an editable baseline for single or fleet installation"),
     "install": ("install", "Seed or upgrade a repository's tool-neutral agent guide"),
     "capsule": ("capsule", "Capture, inspect and replay a setup; always redacted"),
     "fleet": ("fleet", "Status and mass apply across many repositories"),
