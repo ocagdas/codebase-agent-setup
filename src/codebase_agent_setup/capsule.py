@@ -196,7 +196,9 @@ def create(request):
         for name, text in contents.items():
             path = location / FILES / name
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text, encoding="utf-8")
+            # Match the hashed bytes and ZIP representation on every host; text
+            # writes otherwise translate LF to CRLF on Windows.
+            path.write_bytes(text.encode("utf-8"))
     else:
         location = Path(request.out or "cbsetup-capsule.zip")
         if location.exists():

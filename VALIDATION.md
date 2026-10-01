@@ -5,14 +5,18 @@ Use Git history for superseded evidence.
 
 ## Verified locally
 
-2026-10-01, dev/mvp_0.30-consolidation, Linux/Python 3.12.12, Ruff 0.16.8:
+2026-10-01, dev/mvp_0.30, Linux/Python 3.12.12, Ruff 0.16.8:
 `CBSETUP_PACKAGE_TESTS=1 .venv/bin/python scripts/check.py --full` passed with **217 unit/distribution tests
 and 31 payload/bootstrap tests, zero failures and zero skips**. Formatting, lint, contracts and shared-standard
 conformance passed. Static/editable builds and installs ran. Version check and check-pr report 1.1.0, matching main.
 Remote/local tags and GitHub releases are absent; REPOSITORY_VERSIONING_ENABLED is false.
 This supersedes the operational Spec Kit prerequisites below, which are historical evidence only.
 The old 9224bf8 hosted run failed Windows and full integration; this port corrects the diagnosed paths and deleted
-setup calls, but hosted qualification of the new branch is still required. No new PR, tag or release is created.
+setup calls. Hosted run 36789363776 passed Linux/macOS, analysis, artifacts and full integration, but failed
+Windows with six capsule errors: folder writes translated the bytes after hashing. Capsule files now use binary
+UTF-8 writes, with a folder digest regression assertion. Hosted qualification of this correction is still required.
+The redundant consolidation and two guide branches were backed up and removed; dev/mvp_0.30 is the sole PR branch.
+No new PR, tag or release is created.
 
 Tool-neutral agent guide, handover contract, `--no-speckit`, `--adopt`, automatic Spec Kit provisioning and the
 R-B1/R-B2 fixes (branch `dev/neutral-guide`, 2026-09-29) on Linux/Python 3.12.12: unit profile

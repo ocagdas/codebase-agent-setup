@@ -72,6 +72,10 @@ class CreateTests(CapsuleHarness):
         for entry in manifest["entries"]:
             with self.subTest(entry["path"]):
                 self.assertTrue((Path(result.location) / "files" / entry["path"]).is_file())
+                self.assertEqual(
+                    capsule.digest_bytes((Path(result.location) / "files" / entry["path"]).read_bytes()),
+                    entry["sha256"],
+                )
 
     def test_zip_is_the_default_and_contains_the_same_manifest(self):
         result = capsule.create(capsule.Request(home=self.home, repos=[self.repo], out=self.base / "setup.zip"))
