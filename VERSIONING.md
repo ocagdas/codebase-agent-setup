@@ -38,18 +38,14 @@ A version commit and tag are pushed together using `git push --atomic`, without 
 
 ## GitHub activation
 
-Earlier audit 2026-10-01: main CI [run 36847270196](https://github.com/ocagdas/codebase-agent-setup/actions/runs/36847270196)
-passed its Quality gate, but Version and tag trunk was skipped. REPOSITORY_VERSIONING_ENABLED is false;
-CBSETUP_VERSIONING_APP_ID and CBSETUP_VERSIONING_APP_PRIVATE_KEY are not configured at repository scope.
-Active main/v* rulesets currently permit administrator bypass only, not a versioning App. No tags exist.
-Complete the App configuration/bypass below before enabling mutation. Branch names do not select package versions:
-starting from 1.1.0, a qualifying ordinary PR merge increments to 1.1.1, regardless of its dev branch suffix.
-
-Latest audit 2026-10-01: the owner enabled REPOSITORY_VERSIONING_ENABLED=true. Repository-scoped App ID/key
-settings are still absent. Feature push/PR runs cannot publish versions regardless of this flag; complete App
-configuration and protection permissions before the qualifying trunk merge. Changing the flag alone does not
-prove a version/tag was published. PR #13's initial CI failed distribution validation, corrected in 3105dac;
-its latest run fails Windows privacy assertions. The local newline correction needs a fresh hosted run.
+Verified 2026-10-01: PR #13 merged at f8f2d4d. Its Quality gate and all platform checks passed.
+The owner configured the repository App ID/private-key secret and enabled versioning. Rerunning main CI
+[run 36879174228](https://github.com/ocagdas/codebase-agent-setup/actions/runs/36879174228) succeeded,
+including atomic version publication: main advanced to 1cf8650, pyproject.toml is 1.1.1 and v1.1.1 exists.
+Version-commit CI run 36903055110 and tag-triggered Release readiness run 36903055469 passed.
+Public release/PyPI publication remains disabled. No secret values were read.
+App publication is proven; the exact protection/bypass layout and failing-PR enforcement require separate review.
+Branch names do not select package versions. Feature push/PR runs cannot publish versions.
 
 1. Install a repository-scoped GitHub App with Contents read/write permission.
 2. Keep existing variable `CBSETUP_VERSIONING_APP_ID` and secret `CBSETUP_VERSIONING_APP_PRIVATE_KEY` (PEM key). No credential names changed during standardization. The reusable workflow passes the same secret through its internal `versioning-private-key` argument.

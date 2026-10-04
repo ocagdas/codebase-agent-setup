@@ -8,6 +8,7 @@ import sys
 from .resources import PACKAGE_ROOT as ROOT, RESOURCE_ROOT
 
 COMMANDS = {
+    "repo-map": ("repo_map", "Generate, read and transfer local Aider repository maps"),
     "template": ("templates", "Create an editable baseline for single or fleet installation"),
     "install": ("install", "Seed or upgrade a repository's tool-neutral agent guide"),
     "capsule": ("capsule", "Capture, inspect and replay a setup; always redacted"),

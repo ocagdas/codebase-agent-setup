@@ -13,6 +13,10 @@ Python 3.11+. **No runtime dependencies** — standard library only.
 Runs on Linux, macOS and Windows. CI tests Python 3.11–3.13 on Linux and Python 3.13 on macOS/Windows.
 External Git/indexer/transport commands need to be installed separately for the features that use them.
 
+Optional local Aider maps: `cbsetup repo-map build|status|show|export|restore`. Supply an isolated
+Aider Python environment; outputs stay Git-excluded and can be explicitly backed up/transferred.
+See [repository maps](docs/user/repo-map.md) for setup, scopes, privacy and first-stage limitations.
+
 > **Status: pre-release.** Working and used daily on a four-repository fleet, but not yet on PyPI, and the command
 > surface may still change. See [what is not done yet](#what-is-not-done-yet).
 

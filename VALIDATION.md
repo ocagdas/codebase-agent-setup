@@ -3,7 +3,62 @@
 [CI.md](CI.md) owns check commands and [STATUS.md](STATUS.md) owns capabilities.
 Use Git history for superseded evidence.
 
+## Current hosted qualification (2026-10-01)
+
+Owner-published 76aa042 passed push/PR runs 36878525386 and 36878524906, including Windows/Python 3.13,
+macOS/Python 3.13, Linux/Python 3.11/3.12/3.13, formatting/analysis, strict integration, artifacts and Quality gate.
+PR #13 merged at f8f2d4d; main run 36879174228 passed the same checks. Its version job initially lacked App
+configuration, then succeeded on rerun after owner setup. The atomic publisher created main commit 1cf8650
+and tag v1.1.1, matching pyproject.toml version 1.1.1. Version-commit CI 36903055110 and Release readiness
+36903055469 both passed. This proves hosted Windows corrections and App publication,
+not live-agent behavior, a real semantic backend, failing-PR protection enforcement or public publication.
+Local editable metadata was rebuilt using isolated build dependencies and cbsetup --version reports 1.1.1.
+
+Initial private C++ repository pilot: dry run and default upgrade installation succeeded. Repeat preview showed
+no replacements or ignore additions and preserved the filled guide. Read-only fleet status reports 22 managed
+files, zero drift/missing and a filled guide. All 26 installed/local pilot paths are ignored and untracked.
+Fingerprints of 2,272 existing files and the Git index are unchanged, except the intended .gitignore additions;
+existing dirty/untracked product work is preserved. Both configured handovers validate without warnings.
+No product build, real semantic index, live cloud agent or remote publication ran. The initial no-build-isolation
+metadata refresh lacked setuptools; the normal isolated editable rebuild succeeded. Private paths/details remain
+outside this public repository.
+
 ## Verified locally
+
+### External Aider maps (2026-10-02)
+
+A later private full-src pilot selected 1,874 UTF-8 files (one binary/non-UTF-8 exclusion).
+Fresh generation took 116.71 s; unchanged reuse 1.14 s. Map text was 3,164,605 bytes,
+87,642 lines; two-snapshot folder 7,008,476 apparent bytes; peak process RSS 723.94 MiB.
+Eight map-first investigations were then checked against current source. Useful candidate
+locations were found, but callback timing, config semantics, actual test coverage and
+build dependencies required source. Filename coverage is not semantic completeness.
+This session read excerpts at owner request; it was not a separate hosted-client pilot.
+Target Git diff/status/index hashes remained unchanged. No product build/tests, Clang
+invocation, binary/object inspection or execution ran. One local compilation database
+referenced existing source paths; another did not, and semantic build context remains
+unvalidated. No controlled source-only/token-saving measurement or two-PC transfer result.
+Detailed private reports/logs are preserved outside this public repository in workspace
+handover docs; /tmp paths below are transient. This parking pass changes documentation
+only and does not rerun or extend the recorded full-gate qualification.
+
+Local branch dev/aider-repo-maps adds an optional external Aider adapter; package version remains 1.1.1.
+Ten new map regressions pass: privacy/unchanged reuse/stale deletion, scopes/ignored files, dry runs, tracked-cache
+refusal, redacted export, matching-clone restore, tampering/source mismatch, budget changes and missing dependency.
+Real Aider 0.86.2 in a separate temporary Python 3.12 environment generated C++/Python fixture maps with Python
+socket connections disabled. Warm reuse, export/restore and transfer to another checkout passed. Actual static
+and editable package-install checks verify the new command/help and worker files without installing Aider into CAS.
+A bounded private consumer pilot produced a current 290-file structural map, preserved product Git diff/status/index
+hashes, and verified warm reuse plus ignored/untracked output and guidance. No private artifact export, cloud model,
+product build, remote CI, commit or push ran. Both pilot and workspace handovers validate without warnings.
+The first strict attempt exposed new untracked product docs absent from the tracked-only snapshot fixture; new
+product files are now intent-to-add (no staged content/commit). Scope-wide regeneration is not delta caching;
+compiler accuracy, live agent compliance and token savings remain unqualified. See docs/user/repo-map.md.
+Final strict gate passes 258 distribution/unit plus 31 payload tests with zero failures, errors or skips,
+including static/editable installs, formatting, lint, contracts and shared conformance. Log:
+/tmp/cas-aider-full-check-final.log. Local Linux evidence does not establish external Aider on Windows/macOS.
+
+### Earlier local qualification
 
 2026-10-01, dev/mvp_1.1.1 (renamed from dev/local-only-install), Linux/Python 3.12.12: strict
 `CBSETUP_PACKAGE_TESTS=1 .venv/bin/python scripts/check.py --full` passed **248 distribution/unit + 31 payload
@@ -20,7 +75,7 @@ Clean-validator logs: /tmp/cas-clean-checkout-full.log and /tmp/cas-clean-ci-fix
 Latest strict Linux gate, including the Windows-sensitive privacy test correction, passed the same 248 + 31
 tests with no skips; log /tmp/cas-windows-privacy-full.log. Git ignore tests use binary NUL-delimited paths;
 authored-rule checks read newline-normalized text while idempotence still compares bytes, and CRLF input is tested
-on every platform. These two corrected tests need a fresh hosted Windows run; no local Windows execution is claimed.
+on every platform. These corrected tests passed hosted Windows at 76aa042; no local Windows execution is claimed.
 Install, template creation and fleet now apply by default, with --dry-run previews. --behaviour defaults to upgrade;
 preserve adds missing files, override backs up and replaces supported files including the guide. Tests cover all
 modes, unknown unowned-file preservation, unrelated/local-settings preservation, rollback, invalid/conflicting CLI
@@ -33,7 +88,7 @@ Shared setup text is restored to its checksum-pinned baseline; changed conforman
 Three regressions cover tracked-only validation, rejecting missing payload despite local guidance, and legacy
 adapter defaults. The first two reproduced the pre-fix failure. Owner published that correction as 3105dac;
 hosted run 36875946056 passed Linux 3.11/3.12/3.13, macOS, formatting, full integration and artifacts, but failed
-the two Windows privacy assertions above. Their new correction is local/uncommitted/unpushed.
+the two Windows privacy assertions above. Their correction was published as 76aa042 and subsequently passed.
 Current source was applied with override to all four primary checkouts using per-repo editable templates retaining
 their filled guides. Each has 22 managed files plus guide/ledger, all 24 ignored and none tracked; source hashes,
 guides, local settings and existing Git changes were verified unchanged. The pre-existing source-only utility test
@@ -89,7 +144,7 @@ MCP <2 requirement. Installation stopped before the old workflow generated repor
 the artifact-upload failure was downstream. Unit tests separately failed an obsolete
 literal MCP-version assertion. Expected negative-test GO=false output was not the cause.
 
-These fixes require a fresh hosted run. Existing failed runs are not qualified by local
-checks. No new hosted Windows/macOS run, actual artifact upload, public release, App
-publication, Docker/Conda execution, production backend or live-agent validation is
-claimed. No commits, pushes or releases were performed by this fix task.
+The historical failures above are superseded by the current hosted qualification section, not by local checks.
+Docker/Conda execution, production backend and live-agent validation remain unproven. Public publication remains
+disabled. The owner published/merged fixes and configured the App; this documentation/pilot task did not commit,
+push or change hosted settings.

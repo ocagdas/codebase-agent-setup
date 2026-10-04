@@ -67,6 +67,12 @@ class DistributionTests(unittest.TestCase):
                 self.assertFalse((locations[mode] / "stale_module.py").exists())
                 resources[mode] = Path(info["resource_path"])
                 self.assertTrue((locations[mode] / "install_transaction.py").is_file())
+                for name in ("repo_map.py", "aider_worker.py"):
+                    self.assertTrue((locations[mode] / name).is_file())
+                map_help = subprocess.check_output(
+                    [str(launcher), "repo-map", "--help"], cwd=base, text=True, encoding="utf-8"
+                )
+                self.assertIn("restore", map_help)
                 for name in (
                     "project/.github/copilot-instructions.md",
                     "project/.cursor/rules/engineering.mdc",

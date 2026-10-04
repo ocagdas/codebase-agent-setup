@@ -6,6 +6,7 @@ Follow the [README](../../README.md) for installation and the quickstart, then u
   `--adopt` and `handover.path`.
 - [Editable templates and single/fleet installation](templates.md).
 - [Configuring CAS preferences](settings.md).
+- [External Aider repository maps](repo-map.md): local generation, freshness, ignored storage and reviewed transfer.
 - Optional consumer-installed [settings inspection](../../project/ai_workflow/settings.md) and [repository knowledge](../../project/ai_workflow/knowledge.md).
 
 Only repository-work references are installed under project/; CAS administration stays in these user guides.

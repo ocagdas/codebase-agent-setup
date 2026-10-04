@@ -4,6 +4,10 @@ codebase-agent-setup is ready for a project pilot. pyproject.toml is the sole pa
 
 ## Delivered capabilities
 
+- Optional external Aider scope maps through `repo-map`: scoped generation, ignored snapshot storage,
+  source freshness checks, unchanged-map reuse, and explicit redacted export/restore across matching clones.
+  See [usage and limits](docs/user/repo-map.md). This is not yet per-file delta composition or compiler semantics.
+
 - Tool-neutral agent guide: one `AI_CONTEXT.md` with pointers for five assistants, a seeded repository-owned project guide, a handover contract with `handover.path` and a validator, and `--adopt` for existing agent files.
 - Hierarchical project/user/checkout/invocation settings with a shared resolver contract.
 - Repository knowledge: declared indexers, artifacts cached per file content, worktree/branch/base resolution, and sharing through declared transport commands. CAS ships no indexer.
@@ -21,6 +25,13 @@ codebase-agent-setup is ready for a project pilot. pyproject.toml is the sole pa
 - Quality-gated package bump/tag automation, configurable release trunk, atomic publication and common version/gate interfaces. Public GitHub Release/PyPI publication remains disabled.
 
 ## Functional limits
+
+A map-first/source-check pilot across eight investigation areas located useful candidates
+but exposed clipped signatures/bodies, missing behavioral details and filename-only build
+metadata. Structural path coverage is not semantic coverage. Compiler-backed source
+navigation is the next proposed layer; binary/debug analysis is complementary for actual
+built artifacts, not a replacement for current source. Neither layer is implemented by
+the Aider adapter. Full-map injection is not recommended; bounded retrieval is still pending.
 
 Semantic ancestor snapshots and branch composition, authenticated knowledge publication/fetching, automatic semantic refresh, general task migration, concurrent agent orchestration and cache retention remain incomplete. No measured large-repository token-saving claim is established. Markdown instructions alone do not enforce runtime behavior.
 

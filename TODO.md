@@ -4,15 +4,34 @@ This is the tooling distribution's actionable backlog. Consumer feature work sti
 
 ## Priority now (P1 stabilization)
 
-- Qualify dev/mvp_1.1.1 on hosted CI after owner review/publication. MVP #12/main CI already passed; the new
-  privacy/template/behaviour changes are only locally qualified. Spec Kit provisioning and its toolchain gates are retired.
-
-- Configure the versioning App variables/secret and narrowly scoped App bypass described in VERSIONING.md; branch/tag rules are active. Enable REPOSITORY_VERSIONING_ENABLED only after App setup.
-- Run hosted CI and tag-triggered release readiness; prove the active Quality gate rule blocks failing PRs and verify commit/run evidence and App publication on the selected trunk.
-- Execute the declared macOS/Windows matrix and record results. Broaden native installation, real backend and live-agent evidence only through actual runs.
+- PR #13 is merged and its Linux/macOS/Windows matrix, strict integration and Quality gate passed.
+  App configuration is active: the successful rerun published version 1.1.1 and tag v1.1.1 atomically.
+  Tag-triggered Release readiness and version-commit CI passed. Prove protection enforcement
+  separately: a green workflow alone does not prove failing PRs are blocked.
+- Run the local-only private C++ repository pilot: installation/privacy/idempotence, authored-guide preservation,
+  declared-indexer generation, local transport/reuse and incremental regeneration in disposable fixtures.
+  Select a real C++ indexer and validate its compiler/build context before claiming semantic correctness.
+- Qualify guidance discovery and instruction following in fresh Codex, Claude, Copilot and Cursor sessions.
+  CLI availability and pointer-file tests are not live-client evidence. Obtain explicit approval before sending
+  private source or guidance to cloud services.
+- Broaden native installation, real backend and live-agent evidence only through actual runs.
 - Verify the real private security-reporting feature/contact route before advertising it as enabled; maintain the existing SECURITY.md procedure without inventing contacts.
 
 ## Next (P2 pilot execution and contract hardening)
+
+- Work parked on local dev/aider-repo-maps at main 1cf8650/v1.1.1: preserve uncommitted
+  code/tests/docs and intent-to-add files when transferring machines; recreate environments.
+- Validate compilation-database source paths AND compiler/SDK/sysroot/macros/generated
+  headers on representative translation units. Qualify clangd/LSP or portable scip-clang
+  artifacts before claiming semantic precision. Cache identity must include build context
+  and dependency invalidation, not just source hashes. Binary/debug indexing is optional
+  artifact-specific evidence; no binary execution is implied.
+- Add bounded path/symbol-ranked retrieval and source coordinates; repeat eight map/source
+  investigations against a source-only baseline with correctness, latency and actual tokens.
+
+- Extend the initial external Aider scope-map adapter to safe per-file artifact reuse/base-delta composition only
+  after knowledge freshness/tombstone contracts are hardened. Qualify real private-repository coverage and all
+  four agent clients; synthetic map output is not live-agent or token-saving evidence.
 
 - Select a representative repository, languages, build variants, release/RC trunks and real agent clients for a repeatable pilot.
 - Measure source-only versus assisted correctness, cold generation, warm startup, incremental refresh, retrieval accuracy, storage and actual agent token use; agree numerical targets from that baseline.

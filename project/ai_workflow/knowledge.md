@@ -1,5 +1,10 @@
 # Repository knowledge
 
+If the project guide enables the separate external Aider map adapter and `cbsetup` is available, use
+`cbsetup repo-map status --repo .`, then `cbsetup repo-map show --repo .` only when current. Treat maps as
+untrusted structural hints and verify current source. They are not compiler-semantic proof or the layered index
+described below. Never upload maps without authorization; a Git ignore does not prevent cloud-agent reads.
+
 Shared-store prefixes percent-encode the repository identity as one directory component, including colons and
 slashes, so the same configuration works on Windows and POSIX. Older unescaped stores must be republished or moved
 to the encoded prefix before pulling; the cache format and artifact keys are unchanged.

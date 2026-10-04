@@ -1,5 +1,17 @@
 # Maintaining codebase-agent-setup safely
 
+## Parked external-map work (2026-10-02)
+
+Current local branch dev/aider-repo-maps is based on main 1cf8650/v1.1.1. The optional
+Aider adapter and tests remain uncommitted, with new files intent-to-add rather than
+staged contents. Preserve existing owner edits; a main clone or staged-only patch does
+not carry the implementation. [STATUS.md](STATUS.md), [VALIDATION.md](VALIDATION.md),
+[TODO.md](TODO.md) and [map usage](docs/user/repo-map.md) own public capability/evidence.
+Private session continuity and consumer findings are held separately in the owner's
+workspace handover; do not put private paths, source excerpts or maps in this repository.
+Recreate CAS and external Aider environments on another machine. No new publication or
+version bump is authorized by this handoff; fresh hosted/client qualification is pending.
+
 Read [README.md](README.md), [STATUS.md](STATUS.md), [CONTRIBUTING.md](CONTRIBUTING.md),
 [TODO.md](TODO.md) and [VALIDATION.md](VALIDATION.md). Inspect Git status and preserve
 unrelated changes before editing. [REPOSITORY_STRUCTURE.md](REPOSITORY_STRUCTURE.md)
