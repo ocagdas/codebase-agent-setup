@@ -1,20 +1,22 @@
 # codebase-agent-setup
 
-**Set up your AI coding agents once. Use them in every repository, keep them in step, and carry the whole setup to
-another machine in one command.**
+`cbsetup` installs shared repository instructions and entry files for Claude Code, Codex, Copilot, Cursor and
+Gemini CLI. It records installed-file ownership, preserves local edits on upgrade, applies setup across a declared
+fleet, and captures selected local configuration in a capsule. The capsule can restore those files into another
+checkout or home directory. It does not contain a complete running agent environment.
 
-`cbsetup` manages the agent configuration of *many* repositories and of the machine you work on — including the half
-that git cannot hold. It writes one tool-neutral guide that Claude Code, Codex, Copilot, Cursor and Gemini CLI all
-read, keeps a handover document current as work moves between them, and captures your whole setup into a portable
-**capsule** that always has its credentials stripped out.
+Each repository supplies its own commands and policies in the seeded project guide. Sessions maintain the actual
+handover; CAS supplies its contract and validator. Client instruction loading must be checked with the client
+versions in use. The capsule sanitizer always runs, but only recognized credential patterns can be redacted.
 
 Python 3.11+. **No runtime dependencies** — standard library only.
 
 Runs on Linux, macOS and Windows. CI tests Python 3.11–3.13 on Linux and Python 3.13 on macOS/Windows.
 External Git/indexer/transport commands need to be installed separately for the features that use them.
 
-Optional local Aider maps: `cbsetup repo-map build|status|show|export|restore`. Supply an isolated
-Aider Python environment; outputs stay Git-excluded and can be explicitly backed up/transferred.
+Optional repository indexing belongs to the separately installed Codebase Index Kit companion.
+`cbsetup repo-map` and `cbsetup knowledge` are thin bridges, not CAS indexing engines.
+Supply Codebase Index Kit on PATH and an isolated Aider environment for maps; outputs stay private.
 See [repository maps](docs/user/repo-map.md) for setup, scopes, privacy and first-stage limitations.
 
 > **Status: pre-release.** Working and used daily on a four-repository fleet, but not yet on PyPI, and the command
@@ -114,6 +116,11 @@ local settings remain ignored. CAS never changes the Git index: already tracked 
 by their owner while preserving local copies. Ignoring/untracking does not erase remote history, prevent `git add -f`,
 or prevent a cloud assistant from reading/uploading files. Never put credentials in guidance; keep them in dedicated
 local credential storage or environment variables. A `.gitignore` is not a secret scanner or a security boundary.
+
+To leave `.gitignore` entirely untouched, use `cbsetup install . --no-gitignore` or
+`cbsetup fleet --file fleet.json apply --no-gitignore`. CAS will still install its files and
+ledger, but you must decide which paths to ignore. Existing ignore rules remain in effect.
+Use `--dry-run` to check the plan. This is an invocation option, not a settings-file key.
 
 ### Edit a reusable template, then apply it
 
@@ -221,25 +228,28 @@ of the fleet still completes.
 
 ### 3. Backup, restore and clone — outside the repository
 
-This is the part no other tool does. Your repositories are in git; your *setup* is not. `capsule` captures what git
-cannot:
+`capsule` captures selected local setup files that you deliberately keep outside Git:
 
 - your user config (`~/.config/codebase-agent-setup/config.json`)
 - the tool directories `cbsetup` knows: `~/.claude/`, `~/.codex/`, `~/.cursor/`, `~/.gemini/`
-- per-checkout local settings (`ai_workflow/settings.local.json`) and the ledger, for each repository you name
+- per-checkout local settings (`ai_workflow/settings.local.json`), authored project guide, tool manuals and ledger
+
+This is a setup-file archive, not a full environment or running-task backup. The actual handover, model weights,
+worker/database state and files outside the explicit capture list are not included automatically. Known credential
+patterns are redacted; review the archive before sharing it. Existing absolute paths in settings may need rebinding.
 
 **Back up:**
 
 ```bash
 cbsetup capsule create --out ~/backups/setup.zip \
-    --repo ~/code/my-app --repo ~/code/shared-lib
+    --repo ~/code/my-app
 ```
 
 ```text
 Redacted 2 secret value(s) during capture. Restore these yourself:
   tool-global/claude/settings.json: env.ANTHROPIC_API_KEY  (key name 'ANTHROPIC_API_KEY')
   tool-global/codex/config.toml: line 2  (assignment to 'github_token')
-A capsule never carries credentials. Re-enter them by hand, or ask your agent to, after applying.
+Known credential patterns were redacted. Review the archive and restore missing credentials separately.
 ```
 
 **Read that message.** Redaction is not a setting and there is no flag to turn it off. The capsule contains
@@ -286,22 +296,25 @@ outright, not hidden behind a flag.
 
 ## How it compares
 
-[`ruler`](https://github.com/intellectronica/ruler) and [`rulesync`](https://github.com/dyoshikawa/rulesync) fan one
-instruction source out to 30–50 agent clients. They are good at it, with communities that absorb per-client format
-change.
+[`ruler`](https://github.com/intellectronica/ruler) and [`rulesync`](https://github.com/dyoshikawa/rulesync) generate
+client-specific files from shared instruction/configuration inputs.
 
-**`cbsetup` is not competing with them.** They distribute instruction text inside one repository, statelessly,
-regenerating and overwriting. `cbsetup` manages a whole setup across many repositories and the machine, keeps state
-about what it owns, and carries the parts that are not instruction text at all.
+These tools overlap with CAS's client-file generation. Compare actual client loading, edit preservation and
+restore behavior before choosing an implementation; generation, file ownership and backup are not unique to CAS.
+Use [chezmoi](https://www.chezmoi.io/) as another comparison for machine-specific configuration, and
+[gridctl](https://github.com/gridctl/gridctl) for owned projections/packs. Each destination should have one writer.
 
-| | ruler / rulesync | cbsetup |
+| Job | CAS's current behavior | Comparison to make |
 | --- | --- | --- |
-| Scope | One repository | **Many repositories, plus the machine** |
-| State | Stateless: regenerate and overwrite | **A ledger**: knows what it owns and what you edited |
-| Unit of work | Instruction text → client files | **The whole setup**: guide, config, standards, handover |
-| Across sessions | No concept of it | **A handover contract** read, validated and updated by every tool |
-| The ungittable half | Not addressed | **Capsules**: capture, review, apply, clone |
-| Agent clients supported | 30+ / 50+ | 5 — and growing this number is *not* the plan |
+| Client instructions | Five thin pointers to a shared guide | Rulesync/Ruler for additional dialects or an alternative rules workflow |
+| Upgrade and ownership | Ledger, edit preservation and recoverable writes | Edited-file, repeated-apply and removal tests against the chosen manager |
+| Setup transfer | Explicit selected-file capsule with redaction and conflict refusal | Clean-machine restore against chezmoi or a relevant pack/client-settings manager |
+| Session continuity | Handover contract/validator; sessions maintain the content | Verify that actual clients load it and that paths remain correct after relocation |
+
+Capturing multiple repositories is allowed, but applying their layers into one `--repo` target is ambiguous and
+refused. Use a separate capsule per repo when restoring repository state; `--machine-only` can still restore the
+machine layer of a multi-repo capsule. Source checkouts with the same directory name cannot be combined in one
+capsule. Restore also refuses symlinked destination parents and conflicting authored guides before writing.
 
 The intent is to emit ruler's own source format so it fans out to its 30–50 targets, rather than maintaining a
 per-client renderer table here. Use both: ruler for reach, `cbsetup` for continuity, portability and fleet.
@@ -317,7 +330,9 @@ cbsetup capsule create|show|apply
                              Capture, inspect and replay a setup; always redacted
 cbsetup handover             Locate and validate a repository's handover document
 cbsetup configure            Inspect and change settings
-cbsetup knowledge            Optional retrieval backends (off by default)
+cbsetup tools list|show       Supported tools and exact instruction/manual file paths
+cbsetup knowledge            Optional Codebase Index Kit knowledge bridge
+cbsetup repo-map             Optional Codebase Index Kit map bridge
 cbsetup bootstrap            Optional local inventories
 ```
 
@@ -325,6 +340,10 @@ Install, template creation and fleet apply write by default; use `--dry-run` to 
 Other commands retain their existing write controls (for example capsule restore requires `--apply`).
 Old install/fleet `--apply`, `--upgrade` and `--replace-guide` flags remain hidden compatibility aliases;
 use `--behaviour` for new workflows.
+
+User-specific tool instructions live in `ai_workflow/tools/*_manual.md` under the exact
+[tool mapping](docs/user/tools.md). CAS seeds missing manuals and preserves existing
+ones even during override. They remain Git-ignored by default and travel in setup capsules.
 
 ---
 

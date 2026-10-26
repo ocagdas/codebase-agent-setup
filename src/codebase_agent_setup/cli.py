@@ -8,14 +8,15 @@ import sys
 from .resources import PACKAGE_ROOT as ROOT, RESOURCE_ROOT
 
 COMMANDS = {
-    "repo-map": ("repo_map", "Generate, read and transfer local Aider repository maps"),
+    "tools": ("tool_catalog", "List supported tools and their instruction/manual file paths"),
+    "repo-map": ("repo_map", "Optional Codebase Index Kit repository-map bridge"),
     "template": ("templates", "Create an editable baseline for single or fleet installation"),
     "install": ("install", "Seed or upgrade a repository's tool-neutral agent guide"),
     "capsule": ("capsule", "Capture, inspect and replay a setup; always redacted"),
     "fleet": ("fleet", "Status and mass apply across many repositories"),
     "handover": ("project.ai_workflow.tools.validate_handover", "Locate and validate a repository's handover document"),
     "configure": ("project.ai_workflow.tools.settings", "Inspect and change settings"),
-    "knowledge": ("project.ai_workflow.tools.knowledge", "Build, share and query a repository index"),
+    "knowledge": ("project.ai_workflow.tools.knowledge", "Optional Codebase Index Kit knowledge bridge"),
     "bootstrap": ("project.ai_workflow.tools.repo_bootstrap", "Optional local inventories"),
 }
 USAGE = "\n".join(

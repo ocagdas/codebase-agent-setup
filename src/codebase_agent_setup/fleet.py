@@ -46,6 +46,7 @@ class Options(NamedTuple):
     include_owner_only: bool = False
     user_config: Path = None
     track_guidance: bool = False
+    no_gitignore: bool = False
     template: Path = None
     replace_guide: bool = False
     behaviour: str = "upgrade"
@@ -150,6 +151,7 @@ def apply(entries, options):
             adopt=False,
             remove_obsolete=False,
             track_guidance=options.track_guidance,
+            no_gitignore=options.no_gitignore,
             template=options.template,
             replace_guide=options.replace_guide,
             behaviour=options.behaviour,
@@ -204,6 +206,7 @@ def main(argv=None):
     act.add_argument(
         "--track-guidance", action="store_true", help="Opt out of adding guidance ignore rules; state stays ignored"
     )
+    act.add_argument("--no-gitignore", action="store_true", help="Leave each repository's .gitignore untouched")
     act.add_argument(
         "--include-owner-only",
         action="store_true",
@@ -224,6 +227,7 @@ def main(argv=None):
                 include_owner_only=args.include_owner_only,
                 user_config=args.user_config,
                 track_guidance=args.track_guidance,
+                no_gitignore=args.no_gitignore,
                 template=args.template,
                 replace_guide=args.replace_guide,
                 behaviour=args.behaviour,

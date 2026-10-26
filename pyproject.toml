@@ -53,7 +53,7 @@ codebase_agent_setup = [
   "environment.yml",
   "project/ai_workflow/LICENSE", "project/*.md", "project/ai_workflow/*.md", "project/ai_workflow/*.json",
   "project/ai_workflow/*.yaml", "project/ai_workflow/knowledge/*.json",
-  "project/ai_workflow/tools/*.py", "project/.github/*.md",
+  "project/ai_workflow/tools/*.py", "project/ai_workflow/tools/*_manual.md", "project/.github/*.md",
   "project/.cursor/rules/*.mdc"
 ]
 

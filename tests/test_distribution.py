@@ -67,8 +67,8 @@ class DistributionTests(unittest.TestCase):
                 self.assertFalse((locations[mode] / "stale_module.py").exists())
                 resources[mode] = Path(info["resource_path"])
                 self.assertTrue((locations[mode] / "install_transaction.py").is_file())
-                for name in ("repo_map.py", "aider_worker.py"):
-                    self.assertTrue((locations[mode] / name).is_file())
+                self.assertTrue((locations[mode] / "repo_map.py").is_file())
+                self.assertFalse((locations[mode] / "aider_worker.py").exists())
                 map_help = subprocess.check_output(
                     [str(launcher), "repo-map", "--help"], cwd=base, text=True, encoding="utf-8"
                 )
@@ -79,6 +79,12 @@ class DistributionTests(unittest.TestCase):
                     "project/ai_workflow/tools/bootstrap_validation.py",
                     "project/ai_workflow/tools/knowledge_state.py",
                     "project/ai_workflow/bootstrap.schema.json",
+                    "project/ai_workflow/tool_registry.json",
+                    "project/ai_workflow/tools/codex_manual.md",
+                    "project/ai_workflow/tools/claude_manual.md",
+                    "project/ai_workflow/tools/copilot_manual.md",
+                    "project/ai_workflow/tools/cursor_manual.md",
+                    "project/ai_workflow/tools/gemini_manual.md",
                 ):
                     self.assertTrue((resources[mode] / name).is_file(), name)
                 self.assertEqual(

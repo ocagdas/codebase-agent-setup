@@ -55,6 +55,23 @@ class CapsuleHarness(unittest.TestCase):
 
 
 class CreateTests(CapsuleHarness):
+    def test_authored_project_guide_is_captured_and_restored_to_a_new_checkout(self):
+        guide = self.repo / "ai_workflow/project_guide.md"
+        content = "# Project guide\n\nRun the project's checks before changing files.\n"
+        guide.write_text(content, encoding="utf-8")
+        result = self.create()
+        clone = self.base / "elsewhere" / "clone"
+        capsule.apply(result.location, capsule.Target(home=self.base / "new-home", repo=clone, apply=True))
+        self.assertEqual((clone / "ai_workflow/project_guide.md").read_text(encoding="utf-8"), content)
+
+    def test_distinct_checkouts_with_the_same_basename_are_not_silently_merged(self):
+        other = self.base / "other" / self.repo.name
+        local = other / "ai_workflow/settings.local.json"
+        local.parent.mkdir(parents=True)
+        local.write_text("{}", encoding="utf-8")
+        with self.assertRaisesRegex(capsule.CapsuleError, "same.*name|duplicate"):
+            self.create(repos=[self.repo, other])
+
     def test_explicit_home_does_not_capture_the_current_users_windows_config(self):
         with patch.dict("os.environ", {"APPDATA": str(self.base / "ambient")}):
             self.assertEqual(
@@ -176,6 +193,42 @@ class ApplyTests(CapsuleHarness):
         self.assertTrue(plan["writes"])
         self.assertEqual(list(self.target_repo.rglob("*")), [])
         self.assertEqual(list(self.target_home.rglob("*")), [])
+
+    def test_restore_refuses_a_symlinked_parent_before_any_writes(self):
+        outside = self.base / "outside"
+        outside.mkdir()
+        link = self.target_repo / "ai_workflow"
+        try:
+            link.symlink_to(outside, target_is_directory=True)
+        except OSError as error:
+            self.skipTest(str(error))
+        with self.assertRaisesRegex(capsule.CapsuleError, "symlink"):
+            self.apply(apply=True)
+        self.assertEqual(list(outside.iterdir()), [])
+        self.assertEqual(list(self.target_home.iterdir()), [])
+
+    def test_multiple_repository_layers_cannot_be_flattened_into_one_target(self):
+        other = self.base / "second-repo"
+        local = other / "ai_workflow/settings.local.json"
+        local.parent.mkdir(parents=True)
+        local.write_text("{}", encoding="utf-8")
+        source = self.create(repos=[self.repo, other], out_dir=self.base / "multi").location
+        with self.assertRaisesRegex(capsule.CapsuleError, "multiple repository layers"):
+            capsule.apply(source, capsule.Target(home=self.target_home, repo=self.target_repo, apply=True))
+        self.assertEqual(list(self.target_home.iterdir()), [])
+        self.assertEqual(list(self.target_repo.iterdir()), [])
+
+    def test_authored_guide_at_destination_is_not_overwritten_by_default(self):
+        guide = self.repo / "ai_workflow/project_guide.md"
+        guide.write_text("# source guide\n", encoding="utf-8")
+        source = self.create(out_dir=self.base / "with-guide").location
+        destination = self.target_repo / "ai_workflow/project_guide.md"
+        destination.parent.mkdir()
+        destination.write_text("# keep my guide\n", encoding="utf-8")
+        with self.assertRaisesRegex(capsule.CapsuleError, "project_guide.md"):
+            capsule.apply(source, capsule.Target(home=self.target_home, repo=self.target_repo, apply=True))
+        self.assertEqual(destination.read_text(encoding="utf-8"), "# keep my guide\n")
+        self.assertEqual(list(self.target_home.iterdir()), [])
 
     def test_applying_to_another_repository_and_home_is_a_clone(self):
         plan = self.apply(apply=True)

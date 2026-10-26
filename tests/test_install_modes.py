@@ -117,6 +117,25 @@ class PrivacyTests(InstallHarness):
         self.assertIn("/.cbsetup/", lines)
         self.assertIn("/ai_workflow/settings.local.json", lines)
 
+    def test_no_gitignore_option_leaves_existing_rules_untouched(self):
+        ignore = self.repo / ".gitignore"
+        ignore.write_bytes(b"# authored\r\n/private/\r\n")
+        before = ignore.read_bytes()
+        plan = self.run_install(no_gitignore=True)
+        self.assertFalse(plan["manage_gitignore"])
+        self.assertEqual(plan["gitignore_additions"], [])
+        self.assertEqual(ignore.read_bytes(), before)
+        self.assertTrue((self.repo / install.LEDGER).is_file())
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(install.main([str(self.repo), "--no-gitignore", "--user-config", str(self.user)]), 0)
+        self.assertEqual(ignore.read_bytes(), before)
+
+    def test_no_gitignore_option_does_not_create_ignore_file(self):
+        plan = self.run_install(no_gitignore=True)
+        self.assertFalse(plan["manage_gitignore"])
+        self.assertFalse((self.repo / ".gitignore").exists())
+        self.assertTrue((self.repo / "AI_CONTEXT.md").is_file())
+
     def test_override_never_removes_existing_privacy_rules(self):
         self.run_install()
         ignore = self.repo / ".gitignore"

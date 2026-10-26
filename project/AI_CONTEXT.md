@@ -13,6 +13,16 @@ This file is managed by codebase-agent-setup; put repository-specific guidance i
    workflow.
 4. Only the source, tests and documents relevant to the task. Conceptual discussion needs no further loading.
 
+## Tool-specific manuals
+
+`ai_workflow/tool_registry.json` maps tool identities to exact user-maintained manual paths.
+After shared guidance, load only the matching manual for the active tool. Never glob/load
+all `*_manual.md` files, and do not guess an identity from a discovered entry filename.
+If the active tool is unknown, skip tool-specific manuals and report that when relevant.
+These are CAS conventions, not native discovery filenames. CAS preserves existing manuals
+even during override; they supplement shared rules and never override runtime permissions,
+user instructions or project gates. Keep credentials outside guidance.
+
 ## Handover
 
 The handover document carries state between sessions and between tools. Locate it with

@@ -11,7 +11,8 @@ codebase-agent-setup manages repository agent configuration, handovers, portable
 | src/codebase_agent_setup/templates.py | Editable baseline export, supported-path/content validation and source fingerprint verification; no live-repo state export |
 | src/codebase_agent_setup/ | The one command surface: template, install, capsule, fleet, handover, configure, knowledge, bootstrap |
 | project/ | Consumer-installed instructions, defaults, schemas, handover and bootstrap utilities |
-| project/ai_workflow/tools/knowledge.py | Runs declared indexers, caches output per file content, resolves worktree → branch → base, and pushes/pulls through declared transport commands |
+| project/ai_workflow/tools/knowledge.py, src/codebase_agent_setup/repo_map.py | Optional CLI-contract-checked Codebase Index Kit bridges; legacy settings handoff, no indexing engine |
+| src/codebase_agent_setup/tool_catalog.py, project/ai_workflow/tool_registry.json | Supported entry paths and exact user-manual mappings |
 | scripts/, .github/workflows/ | Distribution validation, numeric versions, atomic package tags and release artifacts |
 | tests/, project/ai_workflow/tools/test_*.py | Distribution and installed-utility regression evidence |
 
@@ -33,6 +34,14 @@ Install/fleet --behaviour defaults to upgrade (update unchanged managed files, p
 Preserve adds missing files only; override replaces supported CAS files including the guide with transactional
 backups. Unknown files without ledger ownership are preserved by upgrade. Local settings and unrelated paths are
 outside override. Unsafe paths/non-files always fail. Other command families retain their existing write controls.
+
+User manuals are seeded once and never overwritten by any install behaviour, including
+override. They are excluded from managed/obsolete hashes and included in setup capsules.
+CAS delegates indexing only to an installed `cbkit` executable on PATH after a
+contract-1 capability check; no sibling import, automatic download or fallback engine.
+Codebase Index Kit owns maps/layers/cache/query/transport. CAS retains legacy inventory bootstrap
+and shared revision helpers pending a separate audit. Benchmark/OTel infrastructure remains
+internal development tooling, not part of either consumer setup's required runtime.
 
 ## Packaging resources
 

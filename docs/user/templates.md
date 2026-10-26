@@ -74,10 +74,15 @@ a nonzero exit; a fleet is not one atomic cross-repository transaction. No Git p
 Installed guidance remains ignored by default. --track-guidance skips adding guidance ignores; it never removes
 existing ignores or changes tracking. State and local settings stay ignored. Keep editable templates outside Git
 unless explicitly reviewed for intentional sharing.
+`--no-gitignore` instead skips every `.gitignore` edit for that install or fleet apply;
+CAS still writes its ledger, and the owner supplies any desired ignore rules. No
+settings-file key controls this behavior.
 
 ## Limits
 
 Export currently starts from the built-in baseline, not a live repository. Supported paths are tied to the current
 payload; regenerate/review a template after a CAS payload-layout change. JSON syntax is checked, not arbitrary
-custom schema semantics. Existing capsule repo snapshots still contain only local settings and the ledger, not
-the full installed guidance tree. Full-guidance recovery and explicit export from a live repo remain separate work.
+custom schema semantics. Capsule repo snapshots contain local settings, the ledger, authored project guide and
+user-maintained tool manuals, not the full installed guidance tree or actual external handover. Full-guidance
+recovery and explicit export from a live repo remain
+separate work. Templates never replace existing manuals, even during override.

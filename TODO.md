@@ -1,5 +1,26 @@
 # Open work
 
+## Capsule follow-up — 2026-10-17
+
+Filled project guides are now captured. Restore refuses parent symlinks, ambiguous multi-repo-to-one-target mappings and destination collisions. Remaining: explicit external-handover capture and relocatable path binding; fresh-client loading tests; a same-task comparison with existing instruction/configuration tools before adding emitters. A capsule does not recover harness databases or arbitrary client state.
+
+## Current ownership and priorities — 2026-10-05
+
+The indexing engine/tests have moved to Codebase Index Kit. Indexing tasks retained below are
+historical transfer context; Codebase Index Kit/TODO.md now owns their implementation backlog.
+CAS owns optional contract-checked bridges, setup and manual files, not index orchestration.
+
+- Qualify CAS static/editable bridge packaging, missing/incompatible companion refusal,
+  legacy settings handoff and explicit native configuration selection.
+- Qualify exact tool catalog paths, byte-preserved manuals in all installation behaviours,
+  fleet override, ignore rules and setup capsule restoration.
+- Run fresh-client exact-manual selection checks; pointers/official docs are not live compliance.
+- Audit legacy bootstrap/inventory and shared revision helpers before further separation.
+- Preserve both local working trees during transfer; no remote companion exists yet.
+- Obtain new hosted platform CI after owner publication; old 1.1.1 success does not qualify this delta.
+
+## Historical backlog before extraction
+
 This is the tooling distribution's actionable backlog. Consumer feature work still uses Spec Kit's own tasks.md. Milestones and acceptance belong in [ROADMAP.md](ROADMAP.md); capabilities and evidence belong in [STATUS.md](STATUS.md) and [VALIDATION.md](VALIDATION.md).
 
 ## Priority now (P1 stabilization)

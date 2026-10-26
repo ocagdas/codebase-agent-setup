@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "tools": {
+    "codex": {
+      "entry_file": "AGENTS.md",
+      "manual_file": "ai_workflow/tools/codex_manual.md",
+      "official_patterns": ["AGENTS.md", "AGENTS.override.md"],
+      "source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
+    },
+    "claude": {
+      "entry_file": "CLAUDE.md",
+      "manual_file": "ai_workflow/tools/claude_manual.md",
+      "official_patterns": ["CLAUDE.md", ".claude/CLAUDE.md", ".claude/rules/*.md"],
+      "source": "https://code.claude.com/docs/en/memory"
+    },
+    "copilot": {
+      "entry_file": ".github/copilot-instructions.md",
+      "manual_file": "ai_workflow/tools/copilot_manual.md",
+      "official_patterns": [".github/copilot-instructions.md", ".github/instructions/**/*.instructions.md", "AGENTS.md"],
+      "source": "https://docs.github.com/en/copilot/reference/custom-instructions-support"
+    },
+    "cursor": {
+      "entry_file": ".cursor/rules/engineering.mdc",
+      "manual_file": "ai_workflow/tools/cursor_manual.md",
+      "official_patterns": [".cursor/rules/**/*.mdc", "AGENTS.md"],
+      "source": "https://cursor.com/docs/rules"
+    },
+    "gemini": {
+      "entry_file": "GEMINI.md",
+      "manual_file": "ai_workflow/tools/gemini_manual.md",
+      "official_patterns": ["GEMINI.md"],
+      "source": "https://geminicli.com/docs/cli/gemini-md/"
+    }
+  }
+}

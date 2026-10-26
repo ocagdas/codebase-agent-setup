@@ -1,6 +1,15 @@
 # Maintaining codebase-agent-setup safely
 
-## Parked external-map work (2026-10-02)
+## Current extraction work (2026-10-05)
+
+Local branch dev/mvp_1.1.2 is at 1e52bca with an uncommitted extraction/manual delta;
+version remains 1.1.1 and CI owns its bump/tag. Codebase Index Kit is a separate local repository
+with no commit/remote, holding moved map/knowledge engines and tests. CAS retains optional
+bridges, legacy settings and bootstrap utilities. Preserve BOTH working trees when moving
+machines; a CAS clone alone does not carry the companion. STATUS/VALIDATION/TODO own current
+scope. No commit/PR/push, remote creation, release or version bump is authorized here.
+
+## Historical external-map work (2026-10-02; superseded above)
 
 Current local branch dev/aider-repo-maps is based on main 1cf8650/v1.1.1. The optional
 Aider adapter and tests remain uncommitted, with new files intent-to-add rather than

@@ -1,7 +1,57 @@
 # Current validation
 
+## Correctness audit — 2026-10-17
+
+Capsule regressions cover filled project-guide restoration, parent symlink refusal, duplicate repo names, ambiguous multi-repo mapping and preservation of existing destination guides. `CBSETUP_PACKAGE_TESTS=1 python scripts/check.py --full` passed: **206 distribution tests + 31 payload tests, zero skips**, Ruff formatting/lint, contracts, conformance and real static/editable package installation. Log: `/tmp/toolbox-cas-gate-20261017.log`. No live-client or machine-to-machine environment recovery is established.
+
 [CI.md](CI.md) owns check commands and [STATUS.md](STATUS.md) owns capabilities.
 Use Git history for superseded evidence.
+
+## Ignore-file control — 2026-10-16
+
+`cbsetup install` and `cbsetup fleet apply` now accept `--no-gitignore` to install
+guidance and keep the ledger while leaving `.gitignore` untouched. The default
+ignore behavior and `--track-guidance` retain their previous meanings. New tests
+cover an absent ignore file, byte-preserved existing rules, CLI use and fleet use.
+Focused install/fleet suites passed (25 + 19 tests). The distribution suite passed
+(201 tests, one optional packaging skip), as did the payload suite (31 tests).
+`git diff --check` passed. Ruff and the strict package gate were not run in this
+environment; no hosted or live-client qualification is claimed.
+
+## Pointer simplification — 2026-10-16
+
+The five entry templates now refer only to `AI_CONTEXT.md`; that guide selects the
+active tool's manual from `ai_workflow/tool_registry.json`. The catalog test verifies
+the mapping, shipped manuals and shared-guide pointers without requiring duplicate
+manual paths in each pointer. Focused manual tests passed (5 tests), payload tests
+passed (31), and distribution tests passed (198, one optional packaging skip).
+CAS upgrade applied the pointers at the workspace root and
+all five checkouts, preserving local guides and manuals; a repeat CAS preview showed
+no replacements. A fresh CAS install in a disposable directory produced byte-identical
+copies of all five tracked entry templates and included the Codex registry mapping.
+No live-client behavior or hosted platform is claimed.
+
+## Current extraction/manual delta — 2026-10-05
+
+Local dev/mvp_1.1.2 at 1e52bca, version unchanged at 1.1.1, with an uncommitted
+Codebase Index Kit extraction and tool-manual delta. Strict Linux/Python 3.12 gate passed
+197 distribution/unit + 31 payload tests, zero failures/errors/skips, including actual
+static/editable installations, Ruff, contracts and shared repository conformance.
+Log: /tmp/cas-extraction-full-check.log. These new counts exclude the moved engine tests.
+
+New checks cover exact catalog/entry/manual mappings, byte-preserved user manuals in
+preserve/upgrade/override, missing-manual reseeding, ignore rules, fleet override and
+setup capsule capture/restore. Optional bridges refuse missing/incompatible contracts,
+preserve literal arguments/exit codes, and hand legacy resolved settings through stdin.
+CAS wheels include all manuals/catalog and no longer contain the Aider worker.
+
+The separate Codebase Index Kit suite passed 75 tests with no skips, including actual
+static/editable installations, independent execution after source relocation, direct
+and standalone-payload CAS bridges, and real Aider 0.86.2 synthetic map generation,
+current show/status and warm reuse. That companion evidence does not qualify new CAS
+semantic indexing. No existing target source/build/install/cache changed, no cloud-agent
+trial or hosted platform CI, and no commit/PR/push/tag/remote creation. Bootstrap helper
+ownership remains a deliberate pending audit. Prior hosted evidence below is historical.
 
 ## Current hosted qualification (2026-10-01)
 

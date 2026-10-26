@@ -21,7 +21,7 @@ DEFAULTS = {
     "knowledge": {
         "mode": "auto",
         "base_refs": None,
-        # Declared indexers and a shared store: CAS runs commands, it ships no indexer.
+        # Legacy compatibility settings handed to the separate Codebase Index Kit executable.
         "cache_root": ".ai_cache/knowledge",
         "indexers": [],
         "store": None,

@@ -1,8 +1,15 @@
 # Purpose
 
-codebase-agent-setup manages the agent configuration of many repositories and of the machine they are worked on, including the half that git cannot hold. Its audience includes developers who use more than one agent tool, work across more than one repository, and move between machines.
+codebase-agent-setup writes supported instruction files into a checkout, records their ownership, preserves local
+edits on upgrade, and captures selected setup files that the owner deliberately keeps outside Git. Its audience
+includes developers using several coding clients, repositories or machines.
 
-It installs one tool-neutral guide with a thin pointer per assistant, seeds a repository-owned project guide it never overwrites, and maintains a handover document so work survives a change of tool or session. It captures user config, per-checkout local settings and known tool directories into portable capsules whose credentials are always removed, and it operates across a declared fleet of repositories with a per-repository publication policy.
+It installs a shared guide with a pointer per assistant and seeds a repository-owned project guide, preserved
+unless the owner explicitly requests override. It installs a handover contract and validator; sessions still write
+and maintain the actual handover. Capsules capture selected user/tool settings, checkout-local settings, the
+authored project guide, manuals and ledger with known credential patterns redacted. They do not back up a running
+harness, its database, model weights or arbitrary external handovers. Fleet operations apply the setup to declared
+repositories under their publication policy.
 
 It is not an agent client renderer: fanning instructions out to dozens of tools is `ruler`'s and `rulesync`'s job, and the intention is to emit their source format rather than duplicate it. It no longer installs or manages GitHub Spec Kit (removed 2026-09-30).
 

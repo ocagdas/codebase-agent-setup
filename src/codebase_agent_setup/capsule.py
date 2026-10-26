@@ -24,6 +24,7 @@ from typing import NamedTuple
 import zipfile
 
 from . import redact
+from .tool_catalog import catalog
 
 SCHEMA_VERSION = "1.0"
 MANIFEST = "manifest.json"
@@ -53,7 +54,9 @@ TOOL_PATHS = (
 )
 USER_CONFIG = ToolPath("cbsetup", ".config/codebase-agent-setup", "codebase-agent-setup", ("config.json",))
 # Repository files that are deliberately never committed but are needed again on a clone.
-REPO_FILES = ("ai_workflow/settings.local.json", ".cbsetup/install.json")
+REPO_FILES = ("ai_workflow/settings.local.json", "ai_workflow/project_guide.md", ".cbsetup/install.json") + tuple(
+    entry["manual_file"] for entry in catalog()["tools"].values()
+)
 
 
 class Request(NamedTuple):
@@ -155,8 +158,14 @@ def collect(request):
         root = tool_root(spec, request.home)
         for filename in spec.names:
             add(root / filename, f"tool-global/{spec.tool}/{filename}", "tool-global", target_hint=filename)
+    repo_names = {}
     for repo in request.repos:
         repo = Path(repo).resolve()
+        if repo.name in repo_names:
+            if repo_names[repo.name] != repo:
+                raise CapsuleError(f"Cannot capture distinct repositories with the same name: {repo.name}")
+            continue
+        repo_names[repo.name] = repo
         for relative in REPO_FILES:
             add(repo / relative, f"repo/{repo.name}/{relative}", "repo", target_hint=relative)
     for path in request.include:
@@ -290,6 +299,9 @@ def destination(entry, target):
 
 def apply(location, target):
     manifest = read_manifest(location)
+    repo_names = {entry["path"].split("/")[1] for entry in manifest["entries"] if entry["origin"] == "repo"}
+    if target.repo is not None and len(repo_names) > 1:
+        raise CapsuleError("A single target cannot restore multiple repository layers; create one capsule per repo")
     foreign = manifest.get("host_class") != host_class()
     writes, replaced, skipped_host, skipped_target, restore = [], [], [], [], []
     staged = {}
@@ -304,8 +316,10 @@ def apply(location, target):
         data = read_file(location, entry["path"])
         if digest_bytes(data) != entry["sha256"]:
             raise CapsuleError(f"Capsule file {entry['path']} does not match its manifest digest; refusing to apply")
-        if path.is_symlink():
+        if any(part.is_symlink() for part in (path, *path.parents)):
             raise CapsuleError(f"Refusing to write through a symlink: {path}")
+        if path in staged:
+            raise CapsuleError(f"Multiple capsule entries resolve to the same target: {path}")
         if path.exists():
             if not path.is_file():
                 raise CapsuleError(f"{path} exists and is not a regular file")
@@ -361,7 +375,7 @@ def report_redactions(removals, *, action):
         location = item["location"] if isinstance(item, dict) else item.removal.location
         reason = item["reason"] if isinstance(item, dict) else item.removal.reason
         print(f"  {entry}: {location}  ({reason})")
-    print("A capsule never carries credentials. Re-enter them by hand, or ask your agent to, after applying.")
+    print("Known credential patterns were redacted. Review the archive and restore missing credentials separately.")
 
 
 def main(argv=None):

@@ -1,4 +1,20 @@
-# Roadmap: portable project guidance and reusable code knowledge
+# Roadmap: independent agent setup and continuity
+
+## Current ownership — 2026-10-05
+
+CAS owns neutral guidance/pointers, handovers, templates, privacy, setup capsules,
+single/fleet installation, catalog/user manuals and optional external CLI bridges.
+Codebase Index Kit now owns the moved Aider map and declared-indexer implementations/tests,
+and all future cache/layer/query/compiler/build/artifact/transport milestones below.
+Benchmark/OTel infrastructure remains internal development tooling.
+
+Next CAS acceptance gates: static/editable packaging, companion present/missing/incompatible
+behavior, preserved manuals in all install modes/fleet/capsules, and fresh-client exact-manual
+selection. Audit legacy bootstrap/shared revision helpers before any further extraction.
+Complete full-guidance capsule recovery and live-repo export separately from index transfer.
+No automatic tool download, sibling import or newly granted publication authority.
+
+## Historical indexing roadmap — retained rationale, no longer CAS implementation scope
 
 Status: reconciled with the working tree on 8 September 2026. Configuration, version overrides and packaging are implemented; local retrieval and manual full-snapshot sharing are partial deliveries of the knowledge roadmap. STATUS.md and VALIDATION.md remain the sources for current readiness and executed checks.
 

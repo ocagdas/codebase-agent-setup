@@ -135,6 +135,14 @@ class ApplyTests(FleetHarness):
         self.assertFalse(result["repositories"][0]["local_only"])
         self.assertNotIn("/AI_CONTEXT.md", result["repositories"][0]["gitignore_additions"])
 
+    def test_fleet_can_leave_gitignore_untouched(self):
+        result = fleet.apply(fleet.load(self.file), fleet.Options(apply=True, no_gitignore=True))
+        self.assertEqual(result["failed"], [])
+        repo = self.repos["open-repo"]
+        self.assertTrue((repo / "AI_CONTEXT.md").is_file())
+        self.assertFalse((repo / ".gitignore").exists())
+        self.assertFalse(result["repositories"][0]["manage_gitignore"])
+
     def test_explicit_dry_run_touches_nothing(self):
         result = fleet.apply(fleet.load(self.file), fleet.Options(apply=False))
         self.assertFalse(result["apply"])

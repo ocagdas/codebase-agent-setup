@@ -13,11 +13,13 @@ import datetime
 from .resources import RESOURCE_ROOT as ROOT
 from .project.ai_workflow.tools.settings import resolve
 from . import install_transaction, templates
+from .tool_catalog import catalog
 
 # Where this installer records what it manages. Never inside a directory another tool owns.
 LEDGER = install_transaction.STATE + "/install.json"
-# Seeded once, then repository-owned: only explicit override replaces it; never managed.
-INSTALL_ONCE = frozenset({"ai_workflow/project_guide.md"})
+# Repository-owned seeds: guide replacement is explicit; user manuals are never replaced.
+USER_MANUALS = frozenset(entry["manual_file"] for entry in catalog()["tools"].values())
+INSTALL_ONCE = USER_MANUALS | {"ai_workflow/project_guide.md"}
 GUIDE = "ai_workflow/project_guide.md"
 # Tool entry files that --adopt migrates into the project guide.
 POINTERS = ("AGENTS.md", "CLAUDE.md", "GEMINI.md", ".github/copilot-instructions.md", ".cursor/rules/engineering.mdc")
@@ -138,7 +140,9 @@ def install(args):
         keep_existing = sorted(
             relative
             for relative in INSTALL_ONCE
-            if (target / relative).is_file() and not (target / relative).is_symlink() and not replace_guide
+            if (target / relative).is_file()
+            and not (target / relative).is_symlink()
+            and (relative in USER_MANUALS or not replace_guide)
         )
         for relative in keep_existing:
             (stage / relative).unlink()
@@ -152,9 +156,10 @@ def install(args):
             adopted, referenced = adopt(target, stage, incoming)
         conflicts = []
         # Carry the planning snapshot into the transaction; editors do not acquire our lock.
+        manage_gitignore = not getattr(args, "no_gitignore", False)
         observed = {
             name: install_transaction.digest(install_transaction.checked_path(target, name))
-            for name in set(incoming) | {".gitignore", LEDGER}
+            for name in set(incoming) | {LEDGER} | ({".gitignore"} if manage_gitignore else set())
         }
         ledger = read_ledger(target / LEDGER)
         if upgrade and not ledger and behaviour is None:
@@ -180,16 +185,22 @@ def install(args):
                     else:
                         conflicts.append(relative)
         ignore_target = target / ".gitignore"
-        if ignore_target.is_symlink() or (ignore_target.exists() and not ignore_target.is_file()):
+        if manage_gitignore and (
+            ignore_target.is_symlink() or (ignore_target.exists() and not ignore_target.is_file())
+        ):
             conflicts.append(".gitignore (not a regular file)")
         if conflicts:
             raise RuntimeError("No target writes made. Resolve these collisions:\n" + "\n".join(sorted(set(conflicts))))
         local_only = not getattr(args, "track_guidance", False)
-        existing_ignore = ignore_target.read_text(encoding="utf-8") if ignore_target.exists() else ""
+        existing_ignore = (
+            ignore_target.read_text(encoding="utf-8") if manage_gitignore and ignore_target.exists() else ""
+        )
         exclusions = EXCLUSIONS + (LOCAL_EXCLUSIONS if local_only else ("/.cbsetup/",))
-        missing_ignore = [line for line in exclusions if line not in existing_ignore.splitlines()]
+        missing_ignore = (
+            [line for line in exclusions if line not in existing_ignore.splitlines()] if manage_gitignore else []
+        )
         # Managed files the payload no longer ships.
-        dropped = set(ledger.get("files", {})) - set(incoming)
+        dropped = set(ledger.get("files", {})) - set(incoming) - INSTALL_ONCE
         removable, obsolete_modified = [], []
         for relative in sorted(dropped):
             path = target / relative
@@ -217,6 +228,7 @@ def install(args):
             "template_fingerprint": source_template.fingerprint if source_template else None,
             "replace_guide": replace_guide,
             "local_only": local_only,
+            "manage_gitignore": manage_gitignore,
             "gitignore_additions": missing_ignore,
             "privacy_warning": "Ignore rules do not untrack existing files, erase Git history, or prevent "
             "cloud tools from reading files. Never put credentials in guidance. "
@@ -271,6 +283,8 @@ def install(args):
             )
             writes[".gitignore"] = staged_ignore
         manifest_files = dict(ledger.get("files", {}))
+        for relative in INSTALL_ONCE:
+            manifest_files.pop(relative, None)
         for relative in removals:
             manifest_files.pop(relative, None)
         manifest_files.update(
@@ -311,6 +325,11 @@ def add_arguments(parser):
         action="store_true",
         help="Opt into sharing installed guidance: do not add its local-only .gitignore rules. "
         "Install state/backups/local settings stay ignored; existing rules and tracked files are not untracked",
+    )
+    parser.add_argument(
+        "--no-gitignore",
+        action="store_true",
+        help="Leave .gitignore untouched; review and add any desired guidance/state ignore rules yourself",
     )
     parser.add_argument(
         "--remove-obsolete",

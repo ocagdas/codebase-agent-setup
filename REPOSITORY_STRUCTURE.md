@@ -12,10 +12,9 @@ with hashes in `standards/repository/v1/bundle.json`; runtime sibling imports ar
 | Location | Responsibility |
 |---|---|
 | `src/codebase_agent_setup/` | Importable tooling runtime and installed CLI |
-| `install.py`, `configure.py`, `knowledge.py` | Small source-checkout launchers |
-| `setup_tooling.py`, `docker_install.py` | Machine/container setup entry points |
 | `project/` | Single authored consumer payload, including standalone tools |
-| `preset/`, `extension/` | Authored additions to official Spec Kit |
+| `project/ai_workflow/tools/*_manual.md` | Seed templates for user-maintained tool-specific instructions |
+| `project/ai_workflow/tool_registry.json` | Exact integration file/manual catalog |
 | `src/build_support.py` | Wheel assembly from those authored payloads |
 | `tests/` | Distribution tests; standalone consumer tests remain with their tools |
 | `scripts/`, `.github/workflows/` | Quality and release automation |

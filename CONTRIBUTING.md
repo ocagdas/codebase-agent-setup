@@ -35,7 +35,10 @@ Spec Kit toolchains and their alternate-version tests were retired. Use
 
 ## Repository knowledge checks
 
-`tests/test_knowledge.py` needs no extra dependencies: every test declares a real command and asserts the wrapper runs it, keys its output by each file's content, and refuses the unsafe cases. The property to protect is that editing one file re-indexes exactly one file. When changing the layer model, verify by mutation — revert to whole-layer keying and confirm the two tests written for that property fail.
+The indexing engine and its tests now belong to Codebase Index Kit. CAS tests its optional
+contract-checked bridges, missing-tool refusal and legacy configuration handoff in
+`tests/test_indexing_bridge.py`. No runtime sibling import or automatic installation is allowed.
+Test manuals, transactional preservation and distribution payloads whenever tool paths change.
 
 ## Installed distribution checks
 

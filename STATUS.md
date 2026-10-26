@@ -4,19 +4,25 @@ codebase-agent-setup is ready for a project pilot. pyproject.toml is the sole pa
 
 ## Delivered capabilities
 
-- Optional external Aider scope maps through `repo-map`: scoped generation, ignored snapshot storage,
-  source freshness checks, unchanged-map reuse, and explicit redacted export/restore across matching clones.
+- Optional external Aider scope maps through the Codebase Index Kit `repo-map` bridge: the companion provides
+  scoped generation, ignored snapshot storage, freshness, reuse and explicit transfer across matching clones.
   See [usage and limits](docs/user/repo-map.md). This is not yet per-file delta composition or compiler semantics.
 
 - Tool-neutral agent guide: one `AI_CONTEXT.md` with pointers for five assistants, a seeded repository-owned project guide, a handover contract with `handover.path` and a validator, and `--adopt` for existing agent files.
 - Hierarchical project/user/checkout/invocation settings with a shared resolver contract.
-- Repository knowledge: declared indexers, artifacts cached per file content, worktree/branch/base resolution, and sharing through declared transport commands. CAS ships no indexer.
-- `capsule` (always-redacted backup, restore and clone of a setup) and `fleet status`/`fleet apply` across many repositories.
+- Optional Codebase Index Kit bridges for maps and knowledge. Indexing implementation/tests now
+  live in the separate project; CAS resolves legacy settings and checks CLI contract 1.
+- `tools list|show` catalogs exact entry/manual paths. Five user-maintained manuals are
+  seeded once, preserved even during override, ignored by default and captured in setup capsules.
+- `capsule` captures/applies selected settings, the authored project guide, manuals and ledger with the sanitizer
+  always applied. It refuses conflicting guides, unsafe destination parents and ambiguous repository layers;
+  it is not a full environment or checkpoint backup. `fleet status`/`fleet apply` operate across declared repos.
 - Local Git inventories and file branch deltas, integrity-bound bootstrap requests, incremental record reuse and SHA-1/SHA-256 repository support.
 - Static/editable codebase-agent-setup installations with native/venv/Conda setup paths. Zero runtime dependencies; the only extra is the maintainer toolchain.
 - Conservative install/upgrade with authored-file preservation, recoverable transactions, OS-owned locks and opt-in archival of obsolete managed files.
 - Local-only guidance by default: missing root-relative Git ignores are previewed and installed transactionally;
   `--track-guidance` opts out for intentional sharing without changing existing ignores or the Git index.
+  `--no-gitignore` leaves the ignore file entirely untouched for a single or fleet install.
 - Editable built-in templates: `template create`, single/fleet `--template` installation, validated source paths
   and content, source-change checks, and backed-up `--behaviour override`. Install/template/fleet write by default
   with `--dry-run` previews; `--behaviour preserve|upgrade|override` defaults to upgrade. Installed settings docs are slim;
